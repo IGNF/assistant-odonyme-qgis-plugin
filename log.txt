@@ -1,0 +1,55 @@
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-février-20 14:40:14
+	TRONROUT0000000092972005
+		nom_collaboratif_gauche : CHE DU PETIT MOUSSAT --> CHE DU PETIT MOUSSAT22
+		nom_collaboratif_droite : CHE DU PETIT MOUSSAT --> CHE DU PETIT MOUSSAT22
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 16:42:36
+	TRONROUT0000000092862443
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 14:45:20
+	TRONROUT0000000050025834
+		nom_collaboratif_gauche : NULLhg --> NULL
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 14:45:06
+	TRONROUT0000000050025834
+		nom_collaboratif_gauche : NULL --> NULLhg
+		nom_collaboratif_droite : NULL --> NULLhg
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 14:16:08
+	TRONROUT0000000334090486
+		nom_collaboratif_gauche :  --> gt
+		nom_collaboratif_droite :  --> gt
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 14:15:50
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2025-January-10 14:15:47
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2024-December-16 13:54:33
+	TRONROUT0000000049997481
+		nom_collaboratif_gauche : NULL --> NULLhbdgh
+		nom_collaboratif_droite : NULL --> NULLhbdgh
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2024-December-10 13:41:23
+	TRONROUT0000000049978473
+		nom_collaboratif_gauche : NULL --> NULL2
+		nom_collaboratif_droite : NULL --> NULL2
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2024-November-28 12:58:40
+	TRONROUT0000000092974280
+
+Numéro de la transaction = Pas de transaction vers la BDUNI (travail hors ligne)
+2024-November-26 11:50:31
+	TRONROUT0000002203756666
+		nom_collaboratif_gauche : ROC OUEST2 --> ROC OUEST
+		nom_collaboratif_droite : ROC OUEST2 --> ROC OUEST
+

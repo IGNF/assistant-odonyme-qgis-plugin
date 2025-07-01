@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/plugins/RenommeRue" >
+        <file>icons/icon_principal.png</file>
+	<file>icons/icon_undo.png</file>
+	<file>icons/double_fleche.png</file>
+    </qresource>
+</RCC>
