@@ -6,7 +6,7 @@
 name=IGN Contribution directe BDuni (ODONYME)
 qgisMinimumVersion=3.0
 description=plugin de renommage des noms de rues droite et/ou gauche
-version=0.3
+version=1.0.0
 author=PECHEUR Gérôme
 email=gerome.pecheur@ign.fr
 
