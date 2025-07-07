@@ -591,12 +591,12 @@ class RenommeRue:
 
         if self.is_affiche_sens_num:
             self.dlg.pushButtonsensNumerisation.setText("Afficher le sens de numerisation")
-            self.layer.loadNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "sauvegarde_style_route.qml"))
             self.is_affiche_sens_num = False
         else:
             self.dlg.pushButtonsensNumerisation.setText("Masquer le sens de numerisation")
-            self.layer.saveNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
-            self.layer.loadNamedStyle(os.path.dirname(__file__) + "\style_sens_numerisation.qml")
+            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "sauvegarde_style_route.qml"))
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "style_sens_numerisation.qml"))
             self.is_affiche_sens_num = True
 
         self.layer.triggerRepaint()
