@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>RenommeRueDialogBase</class>
  <widget class="QDialog" name="RenommeRueDialogBase">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>700</width>
-    <height>160</height>
+    <height>250</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +22,7 @@
   <property name="maximumSize">
    <size>
     <width>700</width>
-    <height>160</height>
+    <height>250</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -59,7 +62,7 @@
    <property name="geometry">
     <rect>
      <x>328</x>
-     <y>122</y>
+     <y>192</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -132,7 +135,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>82</y>
+     <y>230</y>
      <width>241</width>
      <height>20</height>
     </rect>
@@ -163,7 +166,7 @@
    <property name="geometry">
     <rect>
      <x>295</x>
-     <y>122</y>
+     <y>192</y>
      <width>31</width>
      <height>31</height>
     </rect>
@@ -250,7 +253,7 @@
    <property name="geometry">
     <rect>
      <x>559</x>
-     <y>130</y>
+     <y>200</y>
      <width>121</width>
      <height>23</height>
     </rect>
@@ -269,7 +272,7 @@
    <property name="geometry">
     <rect>
      <x>559</x>
-     <y>108</y>
+     <y>178</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -285,7 +288,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>200</y>
      <width>21</width>
      <height>23</height>
     </rect>
@@ -433,7 +436,7 @@
    <property name="geometry">
     <rect>
      <x>32</x>
-     <y>130</y>
+     <y>200</y>
      <width>31</width>
      <height>23</height>
     </rect>
@@ -452,7 +455,7 @@
    <property name="geometry">
     <rect>
      <x>64</x>
-     <y>130</y>
+     <y>200</y>
      <width>201</width>
      <height>23</height>
     </rect>
@@ -598,6 +601,122 @@ plus court</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Alias Gauche </string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Alias Droit</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Nom voie BAN gauche</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Nom voie BAN droite</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditAliasG">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>90</y>
+     <width>281</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditAliasD">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>110</y>
+     <width>281</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditBanG">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>130</y>
+     <width>281</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditBanD">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>150</y>
+     <width>281</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

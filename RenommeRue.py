@@ -370,6 +370,12 @@ class RenommeRue:
         idnomruedroite = self.layer.fields().indexFromName(NOM_COLLAB_D)
         idinseeruedroite = self.layer.fields().indexFromName(INSEE_D)
         idinseeruegauche = self.layer.fields().indexFromName(INSEE_G)
+
+        idaliasgauche = self.layer.fields().indexFromName(ALIAS_G)
+        idaliasdroit = self.layer.fields().indexFromName(ALIAS_D)
+        idvoiebangauche = self.layer.fields().indexFromName(VOIE_BAN_G)
+        idvoiebandroite = self.layer.fields().indexFromName(VOIE_BAN_D)
+
         idcleabs = self.layer.fields().indexFromName(CLEABS)
 
         list_nom_rue_d = []
@@ -413,8 +419,14 @@ class RenommeRue:
 
                     self.dlg.comboBoxNomRueGauche.addItem(attr[idnomruegauche])
                     self.dlg.comboBoxNomRueDroite.addItem(attr[idnomruedroite])
-                    # recuperation du nom AVANT changement dans le combobox pour gestion de l'annuler
+                    # LineEdit
+                    self.dlg.lineEditAliasG.setText(attr[idaliasgauche])
+                    self.dlg.lineEditAliasD.setText(attr[idaliasdroit])
+                    self.dlg.lineEditBanG.setText(attr[idvoiebangauche])
+                    self.dlg.lineEditBanD.setText(attr[idvoiebandroite])
 
+
+        # recuperation du nom AVANT changement dans le combobox pour gestion de l'annuler
         self.nomrueGSelection = self.dlg.comboBoxNomRueGauche.currentText()
         self.nomrueDselection = self.dlg.comboBoxNomRueDroite.currentText()
 

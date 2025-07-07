@@ -1,7 +1,7 @@
 
 LAYER_ROUTE = "troncon_de_route"
 TITRE = "Assistant odonyme"
-VERSION = "v1.0.0"
+VERSION = "v1.0.1"
 PLUGIN_ESPACE_CO = "ign_espace_collaboratif"
 
 AUTOROUTE = "Type autoroutier"
@@ -18,6 +18,10 @@ NOM_COLLAB_G = "nom_collaboratif_gauche"
 NOM_COLLAB_D = "nom_collaboratif_droite"
 INSEE_G = "insee_commune_gauche"
 INSEE_D = "insee_commune_droite"
+ALIAS_G = "alias_gauche"
+ALIAS_D = "alias_droit"
+VOIE_BAN_G = "nom_voie_ban_gauche"
+VOIE_BAN_D = "nom_voie_ban_droite"
 NATURE = "nature"
 CLEABS = "cleabs"
 
