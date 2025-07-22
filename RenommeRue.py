@@ -525,12 +525,12 @@ class RenommeRue:
 
         if self.is_affiche_sens_num:
             self.dlg.pushButtonsensNumerisation.setText("Afficher le sens de numerisation")
-            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "sauvegarde_style_route.qml"))
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__),"SENS_NUM", "sauvegarde_style_route.qml"))
             self.is_affiche_sens_num = False
         else:
             self.dlg.pushButtonsensNumerisation.setText("Masquer le sens de numerisation")
-            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "sauvegarde_style_route.qml"))
-            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "style_sens_numerisation.qml"))
+            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "style_sens_numerisation.qml"))
             self.is_affiche_sens_num = True
 
         self.layer.triggerRepaint()
@@ -714,7 +714,7 @@ class RenommeRue:
             # bouton sens de numérisation
             self.dlg.pushButtonsensNumerisation.clicked.connect(self.afficher_sens_num)
             # sauvegarde du style de la couche route
-            self.layer.saveNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
+            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
 
             # affiche le dial au premier plan
             self.dlg.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint)
@@ -727,7 +727,7 @@ class RenommeRue:
             result = self.dlg.exec_()
             # fermeture dialogue
             if result == 0:
-                self.layer.loadNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
+                self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
                 self.layer.triggerRepaint()
                 self.dlgAProposDe.hide()
                 self.insee_commune = ""
