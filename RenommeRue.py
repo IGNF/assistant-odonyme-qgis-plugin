@@ -22,19 +22,9 @@
  ***************************************************************************/
 """
 import copy
-from datetime import datetime
-import time
-# from re import match
 
-from PyQt5.QtWidgets import QPushButton
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
-# from qgis.core import *
 from qgis.core import QgsSingleSymbolRenderer , QgsFeatureRenderer,QgsExpression,Qgis
-# from qgis.gui import QgsOptionsDialogBase
-
 from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import QIcon, QColor, QGuiApplication,QMouseEvent
-from qgis.PyQt.QtWidgets import QAction, QMainWindow, QMessageBox
 # import pour construction d'un graph
 from qgis.analysis import *
 
@@ -45,12 +35,9 @@ from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde
 import os.path
 
-from qgis import processing
-
 from .fonction import *
 from .cheminpluscourt import *
 from .constante import *
-from .tableur import *
 from .event import *
 
 # recuperation de l'id de la transaction (à partir du plugin espace co)
@@ -88,7 +75,7 @@ class RenommeRue:
             return True
 
     def runchepluscourt(self):
-        if not self.insee:
+        if not self.insee_commune:
             afficheerreur("Veuillez renseigner le code INSEE coorespondant à la commune en cours de traitement")
         else:
             self.cheminpluscourt.cheminpluscourt()
@@ -98,7 +85,7 @@ class RenommeRue:
             listid = []
             for sel in self.layer.selectedFeatures():
                 attr = sel.attributes()
-                if attr[id_insseG] == self.insee or attr[id_insseD] == self.insee:
+                if attr[id_insseG] == self.insee_commune or attr[id_insseD] == self.insee_commune:
                     listid.append(sel.id())
             self.layer.selectByIds(listid)
         # re activation du layer route apres traitement
@@ -112,7 +99,7 @@ class RenommeRue:
 
     def selmemenom(self):
 
-        if self.insee == "":
+        if self.insee_commune == "":
             afficheerreur("Veuillez renseigner l'INSEE de la commune à traiter", "Erreur")
             return
 
@@ -145,8 +132,8 @@ class RenommeRue:
         if newnom_d == "NULL":
             newnom_d = "##"
         # selection de troncon avec insee g OU d = insee commune à traiter (à voir pour le OU)
-        expr1 = QgsExpression(f"{NOM_COLLAB_G} = '{newnom_g}' and {INSEE_G} = '{self.insee}'")
-        expr2 = QgsExpression(f"{NOM_COLLAB_D} = '{newnom_d}' and {INSEE_D} = '{self.insee}'")
+        expr1 = QgsExpression(f"{NOM_COLLAB_G} = '{newnom_g}' and {INSEE_G} = '{self.insee_commune}'")
+        expr2 = QgsExpression(f"{NOM_COLLAB_D} = '{newnom_d}' and {INSEE_D} = '{self.insee_commune}'")
         it1 = self.layer.getFeatures(QgsFeatureRequest(expr1))
         it2 = self.layer.getFeatures(QgsFeatureRequest(expr2))
         ids1 = [i.id() for i in it1]
@@ -178,118 +165,73 @@ class RenommeRue:
 
 
     def renomme(self):
-        # TODO renomme
-        if self.insee == "":
+        QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+        if self.insee_commune == "":
             afficheerreur("Veuillez renseigner l'INSEE de la commune à traiter", "Erreur")
             return
 
-        # sauvegarde des objets avant le renommage pour gerer le undo et re_seltroncon
-        # car actualiseselection vide le dicoselection  apres le renommage
-        self.dicoSelectionAvantModif = copy.deepcopy(self.dicoSelection)
+        if len(self.insee_g) != 5 or len(self.insee_d) != 5:
+            afficheerreur("Le numéro INSEE doit contenir 5 chiffres")
+            self.dlg.lineEditINSEEG.setText(self.inseeG_selection)
+            self.dlg.lineEditINSEED.setText(self.inseeD_selection)
+            return
 
         iDnomruegauche = self.layer.fields().indexFromName(NOM_COLLAB_G)
         iDnomruegdroite = self.layer.fields().indexFromName(NOM_COLLAB_D)
 
-        # si le fichier de log est ouvert on quitte. il faut le fermer manuellement
-        if not self.tableur.log_is_open():
-            afficheerreur("fichier deja ouvert")
-            return
-        ligne_excel = []
-
         # passer en mode edition
         self.layer.startEditing()
-
-
 
         # on boucle sur le dico
         # si le insee g ou d == insee commune -> on renomme
         gotransactionGauche = False
         gotransactionDroit = False
         troncon_modif_hors_commune = False
-        log = datetime.today().strftime('%Y-%B-%d %H:%M:%S') + "\n"
         for cle, valeur in self.dicoSelection.items():
-            log += "\t" + cle + "\n"
             # expr = QgsExpression("{} = '{}'".format(CLEABS, cle))
             expr = QgsExpression(f"{CLEABS} = '{cle}'")
             objiterator = self.layer.getFeatures(QgsFeatureRequest(expr))
             ident = [i.id() for i in objiterator]
 
             # valeur[2] = insee gauche
-            if valeur[2] == self.insee and self.isnom_G_modifie:
+            if valeur[2] == self.insee_commune and self.isnom_G_modifie:
                 gotransactionGauche = True
 
             # valeur[3] = insee droite
-            if valeur[3] == self.insee and self.isnom_D_modifie:
+            if valeur[3] == self.insee_commune and self.isnom_D_modifie:
                 gotransactionDroit = True
 
-            if valeur[2] != self.insee and self.isnom_G_modifie:
+            if valeur[2] != self.insee_commune and self.isnom_G_modifie:
                 troncon_modif_hors_commune = True
-            if valeur[3] != self.insee and self.isnom_D_modifie:
+            if valeur[3] != self.insee_commune and self.isnom_D_modifie:
                 troncon_modif_hors_commune = True
 
             if troncon_modif_hors_commune:
                 afficheerreur(
                     "Vous avez modifié 1 ou 2 coté(s) d'un tronçon en dehors de la commune choisie\n"
                     "Abandon du traitement")
-                # on sort de la boucle mais on fait le reste
+                # on sort de la boucle, mais on fait le reste
                 break
 
             # les 2 cotés sont modifiables dans la bonne commune
             if gotransactionGauche and gotransactionDroit:
-                # xlnomGinitial = valeur[0]
-                # xlnomGfinal = self.dlg.comboBoxNomRueGauche.currentText()
-                self.layer.changeAttributeValue(ident[0], iDnomruegauche, self.dlg.comboBoxNomRueGauche.currentText())
-                log += "\t\t" + NOM_COLLAB_G + " : " + valeur[
-                    0] + " --> " + self.dlg.comboBoxNomRueGauche.currentText() + "\n"
 
-                # xlnomDinitial = valeur[0]
-                # xlnomDfinal = self.dlg.comboBoxNomRueDroite.currentText()
+                self.layer.changeAttributeValue(ident[0], iDnomruegauche, self.dlg.comboBoxNomRueGauche.currentText())
+
                 self.layer.changeAttributeValue(ident[0], iDnomruegdroite, self.dlg.comboBoxNomRueDroite.currentText())
-                log += "\t\t" + NOM_COLLAB_D + " : " + valeur[
-                    1] + " --> " + self.dlg.comboBoxNomRueDroite.currentText() + "\n"
+
             # 1 ou 2 cotés on etes modifié dans la bonne commune
             elif gotransactionGauche or gotransactionDroit:
                 if gotransactionGauche:
-                    # xlnomGinitial = valeur[0]
-                    # xlnomGfinal =
+
                     self.layer.changeAttributeValue(ident[0], iDnomruegauche,self.dlg.comboBoxNomRueGauche.currentText())
-                    log += "\t\t" + NOM_COLLAB_G + " : " + valeur[
-                        0] + " --> " + self.dlg.comboBoxNomRueGauche.currentText() + "\n"
 
                 else:
                     self.layer.changeAttributeValue(ident[0], iDnomruegdroite,self.dlg.comboBoxNomRueDroite.currentText())
-                    log += "\t\t" + NOM_COLLAB_D + " : " + valeur[
-                        1] + " --> " + self.dlg.comboBoxNomRueDroite.currentText() + "\n"
-            # pas de transaction, 1 ou 2 cotés on etes modifié dans 1 autre commune
-            else:
-                # self.layer.commitChanges()
-                self.dlg.pushButtonUndo.setEnabled(True)
-                return
 
-            ligne_excel.append([datetime.today().strftime('%d %B %Y %H:%M'),"En cours de dévo",cle,
-                                    valeur[0],
-                                    self.dlg.comboBoxNomRueGauche.currentText(),
-                                    valeur[1],
-                                    self.dlg.comboBoxNomRueDroite.currentText()])
-
-        # ajout de toutes les ligne en une fois dans le fichier
-        self.tableur.adddonnees(ligne_excel)
-        self.tableur.sauvegarder()
-        log += "\n"
-
-        self.layer.commitChanges()
-        self.re_seltroncon(self.dicoSelectionAvantModif.keys())
-        nbSelection = self.layer.selectedFeatureCount()
-
-        message = f"Le renommage é été effectué sur : {nbSelection} objet(s)"
-        self.iface.messageBar().pushMessage("Info", message, level=Qgis.Info, duration=10)
-        self.dlg.pushButtonUndo.setEnabled(True)
-
-        self.iface.actionZoomToSelected().trigger()
-        ecrire_debut_fichier(log)
-        ecrire_debut_fichier("Numéro de la transaction = " + str(getidtransaction()) + "\n")
-
-
+        QGuiApplication.restoreOverrideCursor()
+        self.afficheMessageBar(
+            f"Les modifications ont été effectués sur : {self.layer.selectedFeatureCount()} tronçon(s)")
 
     # est-ce un troncon modifiable (rte 1 chaussée, rte 2 chaussées, rte empierré, chemin, sentier, autoroute,bretelle,escalier) ?
     def istroncon(self, selection):
@@ -315,17 +257,14 @@ class RenommeRue:
         if any(caractere.isalpha() for caractere in insee):
             isvalide = False
 
-        if self.dlg.lineEditINSEE.text() =="" and isvalide:
-            self.dlg.lineEditINSEE.setText(str(insee))
-            self.insee = str(insee)
+        if self.dlg.lineEditINSEECommune.text() =="" and isvalide:
+            self.dlg.lineEditINSEECommune.setText(str(insee))
+            self.insee_commune = str(insee)
 
 
     def actualiserSelection(self):
-        # TODO actualiserSelection
-
-        # if not self.set_activeLayerRoute():
-        #     return
-        # on initialise le combobox et les linedeit
+        if not self.set_activeLayerRoute():
+            return
 
         # on decoche ici sinon g est rempli avec droit et inversement
         self.dlg.checkBoxCadenas.setChecked(True)
@@ -336,12 +275,14 @@ class RenommeRue:
 
         self.dlg.comboBoxNomRueGauche.clear()
         self.dlg.comboBoxNomRueDroite.clear()
+        self.dlg.lineEditINSEEG.clear()
+        self.dlg.lineEditINSEED.clear()
 
         nbselection = self.layer.selectedFeatureCount()
         # on active les boutons qu'il faut en fonction de la selection
         if nbselection == 0:
             self.dlg.pushButtonModifier.setEnabled(False)
-            self.dlg.pushButtonModifier.setStyleSheet('color: grey')
+            # self.dlg.pushButtonModifier.setStyleSheet('color: grey')
             self.dlg.pushButtonTrajCourt.setEnabled(False)
             self.dlg.pushButtonTrajCourt.setStyleSheet('color: grey')
             self.dlg.pushButtonmemenom.setEnabled(False)
@@ -381,6 +322,9 @@ class RenommeRue:
         list_nom_rue_d = []
         list_nom_rue_g = []
 
+        list_insee_g = []
+        list_insee_d = []
+
         list_insee = []
 
         self.dicoSelection.clear()
@@ -399,6 +343,9 @@ class RenommeRue:
                 # ajout des noms de rues aux listes (pour traiter les occurences)
                 list_nom_rue_d.append(attr[idnomruedroite])
                 list_nom_rue_g.append(attr[idnomruegauche])
+
+                list_insee_g.append(attr[idinseeruegauche])
+                list_insee_d.append(attr[idinseeruedroite])
 
                 # test des insee des troncons
                 # si tous identique on renseigne le lineeditinsee s'il est vide
@@ -424,15 +371,32 @@ class RenommeRue:
                     self.dlg.lineEditAliasD.setText(attr[idaliasdroit])
                     self.dlg.lineEditBanG.setText(attr[idvoiebangauche])
                     self.dlg.lineEditBanD.setText(attr[idvoiebandroite])
-
+                    self.dlg.lineEditINSEEG.setText(attr[idinseeruegauche])
+                    self.dlg.lineEditINSEED.setText(attr[idinseeruedroite])
 
         # recuperation du nom AVANT changement dans le combobox pour gestion de l'annuler
         self.nomrueGSelection = self.dlg.comboBoxNomRueGauche.currentText()
         self.nomrueDselection = self.dlg.comboBoxNomRueDroite.currentText()
+        
+        # recuperation des insee avant eventuel changement par l'operateur
+        self.inseeG_selection = self.dlg.lineEditINSEEG.text()
+        self.inseeD_selection = self.dlg.lineEditINSEED.text()
 
         # on trie les combobox par ordre alphabetique
         self.dlg.comboBoxNomRueGauche.model().sort(0, QtCore.Qt.AscendingOrder)
         self.dlg.comboBoxNomRueDroite.model().sort(0, QtCore.Qt.AscendingOrder)
+
+        # traitement des occurence pour les insee g et d (cas de selection multiples)
+        if len(list_nom_rue_g) != 0:
+            if list_insee_g.count(list_insee_g[0]) == len(list_nom_rue_g):
+                self.dlg.lineEditINSEEG.setText(list_insee_g[0])
+            else:
+                self.dlg.lineEditINSEEG.setText("####")
+        if len(list_nom_rue_d) != 0:
+            if list_insee_d.count(list_insee_d[0]) == len(list_nom_rue_d):
+                self.dlg.lineEditINSEED.setText(list_insee_d[0])
+            else:
+                self.dlg.lineEditINSEED.setText("####")
 
         # si on trouve un nombre d'occurences different du nombre des noms de rues = tous les noms ne sont pas
         # identiques
@@ -451,9 +415,9 @@ class RenommeRue:
         self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
 
         # À ce stade le nom dans la combobox n'a pas été modifié par "comboboxchange"
-        # donc on désactive le renommage
+        # donc on désactive le renommage.
         self.dlg.pushButtonModifier.setEnabled(False)
-        self.dlg.pushButtonModifier.setStyleSheet('color: grey')
+        # self.dlg.pushButtonModifier.setStyleSheet('color: grey')
 
         # actualise le label du nombre des troncons séléctionnés
         self.dlg.labelNbTronconSel.setText(f"Vous avez sélectionné : <span style='color: red'><b>{self.layer.selectedFeatureCount()}</b></span> tronçon(s)")
@@ -470,88 +434,43 @@ class RenommeRue:
     def afficheAProposeDe(self):
         self.dlgAProposDe.show()
 
-    def undo(self):
-        # TODO undo
-        self.layer.startEditing()
-
-        # si le fichier de log est ouvert on quitte. il faut le fermer manuellement
-        if not self.tableur.log_is_open():
-            return
-        # ligne pour fichier excel
-        ligne_excel = []
-
-        iDnomruegauche = self.layer.fields().indexFromName(NOM_COLLAB_G)
-        iDnomruegdroite = self.layer.fields().indexFromName(NOM_COLLAB_D)
-        log = datetime.today().strftime('%Y-%B-%d %H:%M:%S') + "\n"
-        for cle, valeur in self.dicoSelectionAvantModif.items():
-            log += "\t" + cle + "\n"
-            # expr = QgsExpression("{} = '{}'".format(CLEABS, cle))
-            expr = QgsExpression(f"{CLEABS} = '{cle}'")
-            objiterator = self.layer.getFeatures(QgsFeatureRequest(expr))
-            ident = [i.id() for i in objiterator]
-            # valeur[0] = nom G
-            # valeur[1] = nom D
-
-            # recuperation des attributs actuels du tronçon pour gerer le log
-            entite = self.layer.getFeature(ident[0])
-
-            # test si le nom G a vraiment été modifié
-            if entite[NOM_COLLAB_G] != valeur[0]:
-                self.layer.changeAttributeValue(ident[0], iDnomruegauche, valeur[0])
-                log += "\t\t" + NOM_COLLAB_G + " : " + entite[NOM_COLLAB_G] + " --> " + valeur[0] + "\n"
-
-            # test si le nom D a vraiment été modifié
-            if entite[NOM_COLLAB_D] != valeur[1]:
-                self.layer.changeAttributeValue(ident[0], iDnomruegdroite, valeur[1])
-                log += "\t\t" + NOM_COLLAB_D + " : " + entite[NOM_COLLAB_D] + " --> " + valeur[1] + "\n"
-
-            ligne_excel.append([datetime.today().strftime('%d %B %Y %H:%M'),"En cours de dévo", cle,
-                                    entite[NOM_COLLAB_G],
-                                    valeur[0],
-                                    entite[NOM_COLLAB_D],
-                                    valeur[1]])
-
-        self.tableur.adddonnees(ligne_excel)
-        self.tableur.sauvegarder()
-
-
-        log += "\n"
-
-        self.layer.commitChanges()
-        self.re_seltroncon(self.dicoSelectionAvantModif.keys())
-        self.iface.actionZoomToSelected().trigger()
-        ecrire_debut_fichier(log)
-        ecrire_debut_fichier("Numéro de la transaction = " + str(getidtransaction()) + "\n")
-
-        self.dlg.pushButtonUndo.setEnabled(False)
-        self.dicoSelectionAvantModif.clear()
-
     def lineeditINSEEChange(self):
-        self.insee = self.dlg.lineEditINSEE.text()
-        if any(caractere.isalpha() for caractere in self.insee):
+        self.insee_commune = self.dlg.lineEditINSEECommune.text()
+        if any(caractere.isalpha() for caractere in self.insee_commune):
             afficheerreur("Veuillez renseigner uniquement des chiffres")
-            self.dlg.lineEditINSEE.setText("")
+            self.dlg.lineEditINSEECommune.setText("")
+
+    def lineeditINSEEChangeGauche(self):
+        self.insee_g = self.dlg.lineEditINSEEG.text()
+        if any(caractere.isalpha() for caractere in self.insee_g):
+            if self.insee_g != "NULL":
+                afficheerreur("Veuillez renseigner uniquement des chiffres")
+                self.dlg.lineEditINSEEG.setText("")
+        self.widgetschange()
+
+    def lineeditINSEEChangeDroite(self):
+        self.insee_d = self.dlg.lineEditINSEED.text()
+        if any(caractere.isalpha() for caractere in self.insee_d):
+            if self.insee_d != "NULL":
+                afficheerreur("Veuillez renseigner uniquement des chiffres")
+                self.dlg.lineEditINSEED.setText("")
+        self.widgetschange()
 
     def comboboxchange_droit(self):
         # on ajoute dans le G que si on a cliqué manuellement dans le combo(zone de texte)
         # et non avec actualiser selection
         if self.dlg.checkBoxCadenas.isChecked() and self.custom_line_edit_combo_d.clic_in_zone_text():
             self.dlg.comboBoxNomRueGauche.setCurrentText(self.dlg.comboBoxNomRueDroite.currentText())
-        self.comboboxchange()
+        self.widgetschange()
 
     def comboboxchange_gauche(self):
         # on ajoute dans le D que si on a cliqué manuellement dans le combo(zone de texte)
         # et non avec actualiser selection
         if self.dlg.checkBoxCadenas.isChecked() and self.custom_line_edit_combo_g.clic_in_zone_text():
             self.dlg.comboBoxNomRueDroite.setCurrentText(self.dlg.comboBoxNomRueGauche.currentText())
-        self.comboboxchange()
+        self.widgetschange()
 
-    def modify_text_via_method(self):
-        """Simule une modification via une méthode"""
-        self.line_edit.setText("Texte modifié par méthode")
-
-
-    def comboboxchange(self):
+    def widgetschange(self):
         # TODO comboboxchange
         # on a modifié le nom dans le combobox
         if self.layer.selectedFeatureCount()==0:
@@ -559,32 +478,47 @@ class RenommeRue:
 
         if self.nomrueGSelection != self.dlg.comboBoxNomRueGauche.currentText():
             self.dlg.pushButtonModifier.setEnabled(True)
-            self.dlg.pushButtonModifier.setStyleSheet('color: blue')
+            # self.dlg.pushButtonModifier.setStyleSheet('color: blue')
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isnom_G_modifie = True
         else:
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
             self.dlg.pushButtonModifier.setEnabled(False)
-            self.dlg.pushButtonModifier.setStyleSheet('color: grey')
+            # self.dlg.pushButtonModifier.setStyleSheet('color: grey')
             self.isnom_G_modifie = False
 
         if self.nomrueDselection != self.dlg.comboBoxNomRueDroite.currentText():
             self.dlg.pushButtonModifier.setEnabled(True)
-            self.dlg.pushButtonModifier.setStyleSheet('color: blue')
+            # self.dlg.pushButtonModifier.setStyleSheet('color: blue')
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isnom_D_modifie = True
         else:
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
             self.dlg.pushButtonModifier.setEnabled(True)
-            self.dlg.pushButtonModifier.setStyleSheet('color: blue')
+            # self.dlg.pushButtonModifier.setStyleSheet('color: blue')
             self.isnom_D_modifie = False
 
-        if self.isnom_G_modifie or self.isnom_D_modifie:
-            self.dlg.pushButtonModifier.setEnabled(True)
-            self.dlg.pushButtonModifier.setStyleSheet('color: blue')
+        # insee g et d
+        if self.inseeG_selection != self.dlg.lineEditINSEEG.text():
+            # self.dlg.pushButtonModifier.setEnabled(True)
+            self.isinsee_G_modifie = True
         else:
             self.dlg.pushButtonModifier.setEnabled(False)
-            self.dlg.pushButtonModifier.setStyleSheet('color: grey')
+            self.isinsee_G_modifie = False
+        if self.inseeD_selection != self.dlg.lineEditINSEED.text():
+            # self.dlg.pushButtonModifier.setEnabled(True)
+            self.isinsee_D_modifie = True
+        else:
+            self.dlg.pushButtonModifier.setEnabled(False)
+            self.isinsee_D_modifie = False
+
+
+        if self.isnom_G_modifie or self.isnom_D_modifie or self.isinsee_G_modifie or self.isinsee_D_modifie:
+            self.dlg.pushButtonModifier.setEnabled(True)
+            # self.dlg.pushButtonModifier.setStyleSheet('color: blue')
+        else:
+            self.dlg.pushButtonModifier.setEnabled(False)
+            # self.dlg.pushButtonModifier.setStyleSheet('color: grey')
 
     def afficher_sens_num(self):
         #     TODO afficher_sens_num
@@ -604,54 +538,34 @@ class RenommeRue:
 
     def __init__(self, iface):
 
-        """Constructor.
-    
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
-
         # zone de texte perso du combobox
         self.custom_line_edit_combo_g = None
         self.custom_line_edit_combo_d = None
 
-
         # boolean pour afficher/masquer le sens de numerisation
         self.is_affiche_sens_num = False
-        # class du tableur
-        self.tableur = None
 
         # copie du dictionnaire de selection AVANT de renommer pour gerer le undo sur les id
         self.cheminpluscourt = None
 
         self.isnom_G_modifie = False
         self.isnom_D_modifie = False
+        self.isinsee_G_modifie = False
+        self.isinsee_D_modifie = False
 
-        self.insee = ""
+        self.insee_commune = ""
+        self.insee_g = ""
+        self.insee_d = ""
         self.dicoSelection = {}
         self.dicoSelectionAvantModif = {}
         # self.listCleabsSelectionAvantModif = []
         self.nomrueDselection = None
         self.nomrueGSelection = None
-
-        # self.projectionLayer = None
-        # self.projectionProjet = None
-
-        # objets et avant renommage
-        self.featuresAvantModif = None
-
-        # self.menuIGN = None
-        self.actionRenommeRue = None
+        self.inseeG_selection = None
+        self.inseeD_selection = None
 
         self.dlg = None
         self.dlgAProposDe = None
-
-        # TEST
-        # self.event = Eventwidget(self)
-        # self.line_edit = self.dlg.comboBoxNomRueGauche.lineEdit()
-
-        # self.dialvisible = None
 
         self.iface = iface
         self.layer = None
@@ -721,10 +635,6 @@ class RenommeRue:
             afficheerreur("Veuillez charger un projet et/ou activer la couche des tronçons de route")
             return
 
-        # self.projectionLayer = self.layer.crs()
-        # projet = QgsProject.instance()
-        # self.projectionProjet = projet.crs()
-
         # evenement de changement de selection pour actualiser la selection des Qcombobox
         self.iface.mapCanvas().selectionChanged.connect(self.actualiserSelection)
 
@@ -733,19 +643,15 @@ class RenommeRue:
         if self.first_start:
             self.first_start = False
             self.dlg = RenommeRueDialog()
-            # self.dlg.setStyleSheet(FOND_DIAL)
 
             self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
-            self.tableur = Tableur()
-
             self.dlgAProposDe = Aproposde()
-            # self.dlgAProposDe.setStyleSheet(FOND_DIAL)
             self.dlgAProposDe.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
-            self.dlgAProposDe.setWindowTitle(f"{TITRE}")
+            self.dlgAProposDe.setWindowTitle(f"{TITRE} {VERSION}")
 
-            self.dlg.setWindowTitle(f"{TITRE}")
+            self.dlg.setWindowTitle(f"{TITRE} {VERSION}")
             self.dlg.label_nom_rue_droite.setStyleSheet(CUSTOM_WIDGETS[3])
             self.dlg.label_nom_rue_gauche.setStyleSheet(CUSTOM_WIDGETS[3])
 
@@ -768,7 +674,7 @@ class RenommeRue:
 
             # À la premiere ouverture, on ne peut pas renommer
             self.dlg.pushButtonModifier.setEnabled(False)
-            self.dlg.pushButtonModifier.setStyleSheet('color: grey')
+            self.dlg.pushButtonModifier.setStyleSheet(CUSTOM_WIDGETS[4])
 
             # on masque par defaut le warning exclamation
             self.dlg.labelexclamation_d.setStyleSheet('color: red')
@@ -783,13 +689,15 @@ class RenommeRue:
             self.dlg.comboBoxNomRueGauche.currentTextChanged.connect(self.comboboxchange_gauche)
             self.dlg.comboBoxNomRueDroite.currentTextChanged.connect(self.comboboxchange_droit)
 
-            # evenement du lineeditINSEE
-            self.dlg.lineEditINSEE.textChanged.connect(self.lineeditINSEEChange)
-            self.dlg.lineEditINSEE.setStyleSheet(CUSTOM_WIDGETS[2])
+            # evenement du lineEditINSEECommune
+            self.dlg.lineEditINSEECommune.textChanged.connect(self.lineeditINSEEChange)
+            self.dlg.lineEditINSEECommune.setStyleSheet(CUSTOM_WIDGETS[2])
+            # evenement des insee g et d
+            self.dlg.lineEditINSEEG.textChanged.connect(self.lineeditINSEEChangeGauche)
+            self.dlg.lineEditINSEED.textChanged.connect(self.lineeditINSEEChangeDroite)
 
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
-
 
             # Bouton : renomme la rue
             self.dlg.pushButtonModifier.clicked.connect(self.renomme)
@@ -800,24 +708,16 @@ class RenommeRue:
             # bouton de selection des troncons portant le meme nom de rue
             self.dlg.pushButtonmemenom.clicked.connect(self.selmemenom)
 
-            # bouton UNDO, et desactiver au lancement
-            self.dlg.pushButtonUndo.setEnabled(False)
-            self.dlg.pushButtonUndo.clicked.connect(self.undo)
-
             # bouton a propos de
             self.dlg.pushButtonAide.clicked.connect(self.afficheAProposeDe)
-
-            # bouton log
-            self.dlg.pushButtonLog.clicked.connect(afficherlog)
 
             # bouton sens de numérisation
             self.dlg.pushButtonsensNumerisation.clicked.connect(self.afficher_sens_num)
             # sauvegarde du style de la couche route
             self.layer.saveNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
 
-
             # affiche le dial au premier plan
-            self.dlg.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
+            self.dlg.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint)
 
             # self.dialvisible = True
             self.dlg.show()
@@ -830,7 +730,7 @@ class RenommeRue:
                 self.layer.loadNamedStyle(os.path.dirname(__file__) + "\sauvegarde_style_route.qml")
                 self.layer.triggerRepaint()
                 self.dlgAProposDe.hide()
-                self.insee = ""
+                self.insee_commune = ""
                 self.is_affiche_sens_num = False
                 # self.dialvisible = False
             self.first_start = True

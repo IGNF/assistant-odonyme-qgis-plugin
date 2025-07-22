@@ -1,7 +1,7 @@
 
 LAYER_ROUTE = "troncon_de_route"
 TITRE = "Assistant odonyme"
-VERSION = "v1.0.1"
+VERSION = "v1.1.0"
 PLUGIN_ESPACE_CO = "ign_espace_collaboratif"
 
 AUTOROUTE = "Type autoroutier"
@@ -26,14 +26,13 @@ NATURE = "nature"
 CLEABS = "cleabs"
 
 
-FOND_DIAL = "background-color:#d3ddff"
-
-
 # 0 : text rouge
 # 1 : text vert
 # 2 : fond blanc
 # 3 : label
+
 CUSTOM_WIDGETS = ("color: #db1515 ;font-weight: bold;border: solid #db1515;border-width : 1px",
                   "color: #1a6d0f ;font-weight: bold;border: solid #1a6d0f;border-width : 1px",
                   "background-color:#ffffff;border: solid black;border-width : 2px",
-                  "background-color: #cccccc")
+                  "background-color: #cccccc",
+                  "background-color: #df920d ;font-weight: bold")

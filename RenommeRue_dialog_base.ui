@@ -9,20 +9,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>250</height>
+    <width>770</width>
+    <height>235</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>700</width>
-    <height>160</height>
+    <width>770</width>
+    <height>235</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>700</width>
-    <height>250</height>
+    <width>770</width>
+    <height>235</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
     <rect>
      <x>10</x>
      <y>61</y>
-     <width>211</width>
+     <width>201</width>
      <height>20</height>
     </rect>
    </property>
@@ -50,7 +50,7 @@
     <rect>
      <x>10</x>
      <y>41</y>
-     <width>211</width>
+     <width>201</width>
      <height>20</height>
     </rect>
    </property>
@@ -61,8 +61,8 @@
   <widget class="QPushButton" name="pushButtonModifier">
    <property name="geometry">
     <rect>
-     <x>328</x>
-     <y>192</y>
+     <x>336</x>
+     <y>180</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -87,7 +87,7 @@
   <widget class="QComboBox" name="comboBoxNomRueGauche">
    <property name="geometry">
     <rect>
-     <x>219</x>
+     <x>289</x>
      <y>41</y>
      <width>251</width>
      <height>20</height>
@@ -112,7 +112,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>219</x>
+     <x>289</x>
      <y>60</y>
      <width>251</width>
      <height>20</height>
@@ -134,8 +134,8 @@
   <widget class="QLabel" name="labelNbTronconSel">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>230</y>
+     <x>270</x>
+     <y>210</y>
      <width>241</width>
      <height>20</height>
     </rect>
@@ -156,39 +156,16 @@
     <enum>Qt::AutoText</enum>
    </property>
    <property name="alignment">
-    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    <set>Qt::AlignCenter</set>
    </property>
    <property name="margin">
     <number>0</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButtonUndo">
-   <property name="geometry">
-    <rect>
-     <x>295</x>
-     <y>192</y>
-     <width>31</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Annuler la modification &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>icons/icon_undo.png</normaloff>icons/icon_undo.png</iconset>
-   </property>
-  </widget>
   <widget class="QLabel" name="labelexclamation_d">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>270</x>
      <y>64</y>
      <width>16</width>
      <height>16</height>
@@ -220,7 +197,7 @@
   <widget class="QLabel" name="labelexclamation_g">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>270</x>
      <y>44</y>
      <width>16</width>
      <height>16</height>
@@ -252,10 +229,10 @@
   <widget class="QgsColorButton" name="mColorButton">
    <property name="geometry">
     <rect>
-     <x>559</x>
-     <y>200</y>
+     <x>639</x>
+     <y>180</y>
      <width>121</width>
-     <height>23</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="cursor">
@@ -271,8 +248,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>559</x>
-     <y>178</y>
+     <x>639</x>
+     <y>160</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -288,9 +265,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>200</y>
-     <width>21</width>
-     <height>23</height>
+     <y>180</y>
+     <width>31</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="cursor">
@@ -316,7 +293,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;INSEE de la commune à traiter :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEditINSEE">
+  <widget class="QLineEdit" name="lineEditINSEECommune">
    <property name="geometry">
     <rect>
      <x>220</x>
@@ -432,32 +409,13 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButtonLog">
-   <property name="geometry">
-    <rect>
-     <x>32</x>
-     <y>200</y>
-     <width>31</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Afficher le journal des modifications&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>log</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButtonsensNumerisation">
    <property name="geometry">
     <rect>
-     <x>64</x>
-     <y>200</y>
+     <x>40</x>
+     <y>180</y>
      <width>201</width>
-     <height>23</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
@@ -479,7 +437,7 @@
   <widget class="QCheckBox" name="checkBoxCadenas">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>560</x>
      <y>52</y>
      <width>16</width>
      <height>17</height>
@@ -495,7 +453,7 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>470</x>
+     <x>540</x>
      <y>41</y>
      <width>20</width>
      <height>40</height>
@@ -520,7 +478,7 @@
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>590</x>
      <y>30</y>
      <width>173</width>
      <height>61</height>
@@ -590,7 +548,7 @@ plus court</string>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>500</x>
+     <x>590</x>
      <y>10</y>
      <width>171</width>
      <height>20</height>
@@ -657,13 +615,13 @@ plus court</string>
   </widget>
   <widget class="QLineEdit" name="lineEditAliasG">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
      <x>130</x>
      <y>90</y>
-     <width>281</width>
+     <width>341</width>
      <height>20</height>
     </rect>
    </property>
@@ -673,13 +631,13 @@ plus court</string>
   </widget>
   <widget class="QLineEdit" name="lineEditAliasD">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
      <x>130</x>
      <y>110</y>
-     <width>281</width>
+     <width>341</width>
      <height>20</height>
     </rect>
    </property>
@@ -695,7 +653,7 @@ plus court</string>
     <rect>
      <x>130</x>
      <y>130</y>
-     <width>281</width>
+     <width>341</width>
      <height>20</height>
     </rect>
    </property>
@@ -711,12 +669,32 @@ plus court</string>
     <rect>
      <x>130</x>
      <y>150</y>
-     <width>281</width>
+     <width>341</width>
      <height>20</height>
     </rect>
    </property>
    <property name="readOnly">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditINSEEG">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>40</y>
+     <width>45</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditINSEED">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>60</y>
+     <width>45</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>
@@ -758,22 +736,6 @@ plus court</string>
     <hint type="destinationlabel">
      <x>368</x>
      <y>85</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButtonUndo</sender>
-   <signal>clicked()</signal>
-   <receiver>RenommeRueDialogBase</receiver>
-   <slot>exec()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>63</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>29</x>
-     <y>90</y>
     </hint>
    </hints>
   </connection>

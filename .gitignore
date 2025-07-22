@@ -1,6 +1,7 @@
-# Ignorer le dossier __pycache__/
 __pycache__/
+help/
+i18n/
+.idea/
+scripts/
 
-sauvegarde_style_route.qml
-transaction.xlsx
 GitGestion.exe

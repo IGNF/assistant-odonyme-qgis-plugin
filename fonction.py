@@ -36,18 +36,6 @@ def afficheDoc():
     else:
         subprocess.Popen(['start', '', fichier], shell=True)
 
-def afficherlog():
-    # fic = os.path.dirname(__file__) + "/log.txt"
-    fic = os.path.dirname(__file__) + "/transaction.xlsx"
-
-    if not os.path.isfile(fic):
-        afficheerreur("Le fichier de log n'existe pas\nIl sera crée dès la premiére transaction", "Information")
-    else:
-        subprocess.Popen(["start", "excel", fic], shell=True)
-
-
-
-
 def affiches_spec_bdtopo():
     import webbrowser
     webbrowser.open("https://bdtopoexplorer.ign.fr/")
@@ -55,7 +43,6 @@ def affiches_spec_bdtopo():
 
 def afficheerreur(text, titre=TITRE):
     msg = QMessageBox()
-    # msg.setStyleSheet(FOND_DIAL)
     msg.setIcon(QMessageBox.Warning)
     msg.setWindowTitle(titre)
     msg.setStandardButtons(QMessageBox.Ok)
@@ -67,7 +54,6 @@ def afficheerreur(text, titre=TITRE):
 def affichemessageAvertissement(text, titre):
     msg = QMessageBox()
     msg.setIcon(QMessageBox.Warning)
-    msg.setStyleSheet(FOND_DIAL)
     msg.setWindowTitle(titre)
     msg.setText(text)
     btnAnnuler = msg.addButton("Annuler", QMessageBox.YesRole)
