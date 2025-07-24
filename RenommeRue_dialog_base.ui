@@ -37,7 +37,7 @@
     <rect>
      <x>10</x>
      <y>61</y>
-     <width>201</width>
+     <width>251</width>
      <height>20</height>
     </rect>
    </property>
@@ -50,7 +50,7 @@
     <rect>
      <x>10</x>
      <y>41</y>
-     <width>201</width>
+     <width>251</width>
      <height>20</height>
     </rect>
    </property>
@@ -286,7 +286,7 @@
      <x>10</x>
      <y>10</y>
      <width>201</width>
-     <height>16</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -626,7 +626,7 @@ plus court</string>
     </rect>
    </property>
    <property name="readOnly">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEditAliasD">
@@ -642,7 +642,7 @@ plus court</string>
     </rect>
    </property>
    <property name="readOnly">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEditBanG">
@@ -675,26 +675,6 @@ plus court</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEditINSEEG">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>40</y>
-     <width>45</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEditINSEED">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>60</y>
-     <width>45</width>
-     <height>20</height>
-    </rect>
    </property>
   </widget>
  </widget>
