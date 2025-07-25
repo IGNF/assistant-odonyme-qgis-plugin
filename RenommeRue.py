@@ -183,19 +183,15 @@ class RenommeRue:
             if valeur[3] == self.insee_commune and self.isnom_D_modifie:
                 gotransactionCollabDroit = True
             # on peut modifier les alias
-            if valeur[2] == self.insee_commune and self.isnom_G_modifie:
+            if valeur[2] == self.insee_commune and self.isalias_g_modifie:
                 gotransactionAliasGauche = True
-            if valeur[3] == self.insee_commune and self.isnom_D_modifie:
+            if valeur[3] == self.insee_commune and self.isalias_d_modifie:
                 gotransactionAliasDroit = True
 
             if valeur[2] != self.insee_commune and (self.isnom_G_modifie or self.isalias_g_modifie):
                 troncon_modif_hors_commune = True
             if valeur[3] != self.insee_commune and (self.isnom_D_modifie or self.isalias_d_modifie):
                 troncon_modif_hors_commune = True
-            # if valeur[2] != self.insee_commune and self.isalias_g_modifie:
-            #     troncon_modif_hors_commune = True
-            # if valeur[3] != self.insee_commune and self.isalias_d_modifie:
-            #     troncon_modif_hors_commune = True
 
             if troncon_modif_hors_commune:
                 afficheerreur(
@@ -219,6 +215,7 @@ class RenommeRue:
                     # nom collabg droit
                     self.layer.changeAttributeValue(ident[0], iDnomruegdroite,self.dlg.comboBoxNomRueDroite.currentText())
 
+            print(gotransactionAliasGauche," : ",self.isalias_g_modifie )
             if gotransactionAliasGauche and self.isalias_g_modifie:
                 self.layer.changeAttributeValue(ident[0], idaliasgauche, self.dlg.lineEditAliasG.text())
             if gotransactionAliasDroit and self.isalias_d_modifie:
@@ -487,9 +484,6 @@ class RenommeRue:
             self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isalias_g_modifie = False
 
-        print(self.aliasGSelection , " : ", self.dlg.lineEditAliasG.text())
-        print(self.aliasDSelection, " : ", self.dlg.lineEditAliasD.text())
-
         # alias droit est modifié
         if self.aliasDSelection != self.dlg.lineEditAliasD.text():
             self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[0])
@@ -502,8 +496,6 @@ class RenommeRue:
             self.dlg.pushButtonModifier.setEnabled(True)
         else:
             self.dlg.pushButtonModifier.setEnabled(False)
-
-        # QMessageBox.information(None,"d","pause")
 
     def afficher_sens_num(self):
         #     TODO afficher_sens_num
