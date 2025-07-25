@@ -634,10 +634,8 @@ class RenommeRue:
             # sauvegarde du style de la couche route
             self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
 
-            # affiche le dial au premier plan
-            self.dlg.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint)
-
-            # self.dialvisible = True
+            self.dlg.setParent(self.iface.mainWindow())
+            self.dlg.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
             self.dlg.show()
 
 
