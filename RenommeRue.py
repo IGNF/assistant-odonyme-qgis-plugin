@@ -21,9 +21,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import copy
 
-from qgis.core import QgsSingleSymbolRenderer , QgsFeatureRenderer,QgsExpression,Qgis
+from qgis.core import QgsExpression,Qgis
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
 from qgis.analysis import *
@@ -164,8 +163,11 @@ class RenommeRue:
 
         # on boucle sur le dico
         # si le insee g ou d == insee commune -> on renomme
-        gotransactionGauche = False
-        gotransactionDroit = False
+        gotransactionCollabGauche = False
+        gotransactionCollabDroit = False
+        gotransactionAliasGauche = False
+        gotransactionAliasDroit = False
+
         troncon_modif_hors_commune = False
         for cle, valeur in self.dicoSelection.items():
             expr = QgsExpression(f"{CLEABS} = '{cle}'")
@@ -173,17 +175,27 @@ class RenommeRue:
             ident = [i.id() for i in objiterator]
 
             # valeur[2] = insee gauche
-            if valeur[2] == self.insee_commune and self.isnom_G_modifie:
-                gotransactionGauche = True
-
             # valeur[3] = insee droite
-            if valeur[3] == self.insee_commune and self.isnom_D_modifie:
-                gotransactionDroit = True
 
-            if valeur[2] != self.insee_commune and self.isnom_G_modifie:
+            # on peut modifier les nom collab
+            if valeur[2] == self.insee_commune and self.isnom_G_modifie:
+                gotransactionCollabGauche = True
+            if valeur[3] == self.insee_commune and self.isnom_D_modifie:
+                gotransactionCollabDroit = True
+            # on peut modifier les alias
+            if valeur[2] == self.insee_commune and self.isnom_G_modifie:
+                gotransactionAliasGauche = True
+            if valeur[3] == self.insee_commune and self.isnom_D_modifie:
+                gotransactionAliasDroit = True
+
+            if valeur[2] != self.insee_commune and (self.isnom_G_modifie or self.isalias_g_modifie):
                 troncon_modif_hors_commune = True
-            if valeur[3] != self.insee_commune and self.isnom_D_modifie:
+            if valeur[3] != self.insee_commune and (self.isnom_D_modifie or self.isalias_d_modifie):
                 troncon_modif_hors_commune = True
+            # if valeur[2] != self.insee_commune and self.isalias_g_modifie:
+            #     troncon_modif_hors_commune = True
+            # if valeur[3] != self.insee_commune and self.isalias_d_modifie:
+            #     troncon_modif_hors_commune = True
 
             if troncon_modif_hors_commune:
                 afficheerreur(
@@ -193,27 +205,24 @@ class RenommeRue:
                 break
 
             # les 2 cotés sont modifiables dans la bonne commune
-            if gotransactionGauche and gotransactionDroit:
+            if gotransactionCollabGauche and gotransactionCollabDroit:
                 # nom collab
                 self.layer.changeAttributeValue(ident[0], iDnomruegauche, self.dlg.comboBoxNomRueGauche.currentText())
                 self.layer.changeAttributeValue(ident[0], iDnomruegdroite, self.dlg.comboBoxNomRueDroite.currentText())
-                # alias
-                self.layer.changeAttributeValue(ident[0], idaliasgauche, self.dlg.lineEditAliasG.text())
-                self.layer.changeAttributeValue(ident[0], idaliasdroit, self.dlg.lineEditAliasD.text())
 
             # 1 ou 2 cotés on etes modifié dans la bonne commune
-            elif gotransactionGauche or gotransactionDroit:
-                if gotransactionGauche:
+            elif gotransactionCollabGauche or gotransactionCollabDroit:
+                if gotransactionCollabGauche:
                     # nom collab gauche
                     self.layer.changeAttributeValue(ident[0], iDnomruegauche,self.dlg.comboBoxNomRueGauche.currentText())
-                    # alias
-                    self.layer.changeAttributeValue(ident[0], idaliasgauche, self.dlg.lineEditAliasG.text())
-
                 else:
                     # nom collabg droit
                     self.layer.changeAttributeValue(ident[0], iDnomruegdroite,self.dlg.comboBoxNomRueDroite.currentText())
-                    # alias droit
-                    self.layer.changeAttributeValue(ident[0], idaliasdroit, self.dlg.lineEditAliasD.text())
+
+            if gotransactionAliasGauche and self.isalias_g_modifie:
+                self.layer.changeAttributeValue(ident[0], idaliasgauche, self.dlg.lineEditAliasG.text())
+            if gotransactionAliasDroit and self.isalias_d_modifie:
+                self.layer.changeAttributeValue(ident[0], idaliasdroit, self.dlg.lineEditAliasD.text())
 
         QGuiApplication.restoreOverrideCursor()
         self.afficheMessageBar(
@@ -308,6 +317,8 @@ class RenommeRue:
 
         list_nom_rue_d = []
         list_nom_rue_g = []
+        list_alias_g = []
+        list_alias_d = []
 
         list_insee = []
 
@@ -327,6 +338,8 @@ class RenommeRue:
                 # ajout des noms de rues aux listes (pour traiter les occurences)
                 list_nom_rue_d.append(attr[idnomruedroite])
                 list_nom_rue_g.append(attr[idnomruegauche])
+                list_alias_g.append(attr[idaliasgauche])
+                list_alias_d.append(attr[idaliasdroit])
 
                 # test des insee des troncons
                 # si tous identique on renseigne le lineeditinsee s'il est vide
@@ -340,9 +353,12 @@ class RenommeRue:
 
                 if attr[idnomruegauche] == NULL:
                     self.dlg.comboBoxNomRueGauche.addItem("")
-
                 elif attr[idnomruedroite] == NULL:
                     self.dlg.comboBoxNomRueDroite.addItem("")
+                elif attr[idaliasgauche] == NULL:
+                    self.dlg.lineEditAliasG.setText("")
+                elif attr[idaliasdroit] == NULL:
+                    self.dlg.lineEditAliasD.setText("")
                 else:
 
                     self.dlg.comboBoxNomRueGauche.addItem(attr[idnomruegauche])
@@ -358,7 +374,7 @@ class RenommeRue:
         self.nomrueGSelection = self.dlg.comboBoxNomRueGauche.currentText()
         self.nomrueDselection = self.dlg.comboBoxNomRueDroite.currentText()
         self.aliasGSelection = self.dlg.lineEditAliasG.text()
-        self.aliasGSelection = self.dlg.lineEditAliasD.text()
+        self.aliasDSelection = self.dlg.lineEditAliasD.text()
 
         # on trie les combobox par ordre alphabetique
         self.dlg.comboBoxNomRueGauche.model().sort(0, QtCore.Qt.AscendingOrder)
@@ -368,6 +384,8 @@ class RenommeRue:
         # identiques
         nb_occurence_nom_d = list_nom_rue_d.count(self.dlg.comboBoxNomRueDroite.currentText())
         nb_occurence_nom_g = list_nom_rue_g.count(self.dlg.comboBoxNomRueGauche.currentText())
+        nb_occurence_alias_g = list_alias_g.count(self.dlg.lineEditAliasG.text())
+        nb_occurence_alias_d = list_alias_d.count(self.dlg.lineEditAliasD.text())
         if nb_occurence_nom_d != len(list_nom_rue_d):
             self.dlg.labelexclamation_d.show()
             # l'affichage des alias et des ban est basé sur les occurences de la liste des NOM DE RUES
@@ -382,9 +400,16 @@ class RenommeRue:
             self.dlg.lineEditAliasG.setText("")
         else:
             self.dlg.labelexclamation_g.hide()
+        if nb_occurence_alias_g != len(list_alias_g):
+            self.dlg.lineEditAliasG.setText("***")
+        if nb_occurence_alias_d != len(list_alias_d):
+            self.dlg.lineEditAliasD.setText("***")
+
 
         self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
         self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
+        self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[1])
+        self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[1])
 
         # À ce stade le nom dans la combobox n'a pas été modifié par "comboboxchange"
         # donc on désactive le renommage.
@@ -412,20 +437,10 @@ class RenommeRue:
             afficheerreur("Veuillez renseigner uniquement des chiffres")
             self.dlg.lineEditINSEECommune.setText("")
 
-    def lineeditINSEEChangeGauche(self):
-        self.insee_g = self.dlg.lineEditINSEEG.text()
-        if any(caractere.isalpha() for caractere in self.insee_g):
-            if self.insee_g != "NULL":
-                afficheerreur("Veuillez renseigner uniquement des chiffres")
-                self.dlg.lineEditINSEEG.setText("")
+    def lineeditAliasGChange(self):
         self.widgetschange()
 
-    def lineeditINSEEChangeDroite(self):
-        self.insee_d = self.dlg.lineEditINSEED.text()
-        if any(caractere.isalpha() for caractere in self.insee_d):
-            if self.insee_d != "NULL":
-                afficheerreur("Veuillez renseigner uniquement des chiffres")
-                self.dlg.lineEditINSEED.setText("")
+    def lineeditAliasDChange(self):
         self.widgetschange()
 
     def comboboxchange_droit(self):
@@ -464,7 +479,7 @@ class RenommeRue:
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isnom_D_modifie = False
 
-        # nom alias gauche est modifié
+        # alias gauche est modifié
         if self.aliasGSelection != self.dlg.lineEditAliasG.text():
             self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isalias_g_modifie = True
@@ -472,7 +487,10 @@ class RenommeRue:
             self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isalias_g_modifie = False
 
-        # nom alias droit est modifié
+        print(self.aliasGSelection , " : ", self.dlg.lineEditAliasG.text())
+        print(self.aliasDSelection, " : ", self.dlg.lineEditAliasD.text())
+
+        # alias droit est modifié
         if self.aliasDSelection != self.dlg.lineEditAliasD.text():
             self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isalias_d_modifie = True
@@ -480,14 +498,12 @@ class RenommeRue:
             self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isalias_d_modifie = False
 
-
-        if (self.isnom_G_modifie or
-                self.isnom_D_modifie or
-                self.isalias_g_modifie or
-                self.isalias_d_modifie):
+        if self.isnom_G_modifie or self.isnom_D_modifie or self.isalias_g_modifie or self.isalias_d_modifie:
             self.dlg.pushButtonModifier.setEnabled(True)
         else:
             self.dlg.pushButtonModifier.setEnabled(False)
+
+        # QMessageBox.information(None,"d","pause")
 
     def afficher_sens_num(self):
         #     TODO afficher_sens_num
@@ -641,6 +657,10 @@ class RenommeRue:
             # evenement du lineEditINSEECommune
             self.dlg.lineEditINSEECommune.textChanged.connect(self.lineeditINSEEChange)
             self.dlg.lineEditINSEECommune.setStyleSheet(CUSTOM_WIDGETS[2])
+
+            # evenement des lineedit alias
+            self.dlg.lineEditAliasG.textChanged.connect(self.lineeditAliasGChange)
+            self.dlg.lineEditAliasD.textChanged.connect(self.lineeditAliasDChange)
 
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
