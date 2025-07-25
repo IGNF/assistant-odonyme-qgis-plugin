@@ -353,10 +353,12 @@ class RenommeRue:
                     self.dlg.lineEditBanG.setText(attr[idvoiebangauche])
                     self.dlg.lineEditBanD.setText(attr[idvoiebandroite])
 
-        # recuperation du nom AVANT changement dans le combobox pour
+        # recuperation du nom AVANT changement dans le combobox et edit pour
         # gerer si on a remis celui initialement.
         self.nomrueGSelection = self.dlg.comboBoxNomRueGauche.currentText()
         self.nomrueDselection = self.dlg.comboBoxNomRueDroite.currentText()
+        self.aliasGSelection = self.dlg.lineEditAliasG.text()
+        self.aliasGSelection = self.dlg.lineEditAliasD.text()
 
         # on trie les combobox par ordre alphabetique
         self.dlg.comboBoxNomRueGauche.model().sort(0, QtCore.Qt.AscendingOrder)
@@ -446,6 +448,7 @@ class RenommeRue:
         if self.layer.selectedFeatureCount()==0:
             return
 
+        # nom collab gauche est modifié
         if self.nomrueGSelection != self.dlg.comboBoxNomRueGauche.currentText():
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isnom_G_modifie = True
@@ -453,6 +456,7 @@ class RenommeRue:
             self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isnom_G_modifie = False
 
+        # nom collab droit est modifié
         if self.nomrueDselection != self.dlg.comboBoxNomRueDroite.currentText():
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isnom_D_modifie = True
@@ -460,7 +464,27 @@ class RenommeRue:
             self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
             self.isnom_D_modifie = False
 
-        if self.isnom_G_modifie or self.isnom_D_modifie:
+        # nom alias gauche est modifié
+        if self.aliasGSelection != self.dlg.lineEditAliasG.text():
+            self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[0])
+            self.isalias_g_modifie = True
+        else:
+            self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[1])
+            self.isalias_g_modifie = False
+
+        # nom alias droit est modifié
+        if self.aliasDSelection != self.dlg.lineEditAliasD.text():
+            self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[0])
+            self.isalias_d_modifie = True
+        else:
+            self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[1])
+            self.isalias_d_modifie = False
+
+
+        if (self.isnom_G_modifie or
+                self.isnom_D_modifie or
+                self.isalias_g_modifie or
+                self.isalias_d_modifie):
             self.dlg.pushButtonModifier.setEnabled(True)
         else:
             self.dlg.pushButtonModifier.setEnabled(False)
@@ -494,6 +518,8 @@ class RenommeRue:
         self.isnom_D_modifie = False
         self.isinsee_G_modifie = False
         self.isinsee_D_modifie = False
+        self.isalias_g_modifie = False
+        self.isalias_d_modifie = False
 
         self.insee_commune = ""
         self.insee_g = ""
@@ -502,6 +528,8 @@ class RenommeRue:
         # self.listCleabsSelectionAvantModif = []
         self.nomrueDselection = None
         self.nomrueGSelection = None
+        self.aliasGSelection  =None
+        self.aliasDSelection = None
 
         self.dlg = None
         self.dlgAProposDe = None
