@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsExpression,Qgis
+from qgis.core import QgsExpression,Qgis,QgsMapLayer
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
 from qgis.analysis import *
@@ -501,12 +501,12 @@ class RenommeRue:
         #     TODO afficher_sens_num
         if self.is_affiche_sens_num:
             self.dlg.pushButtonsensNumerisation.setText("Afficher le sens de numerisation")
-            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__),"SENS_NUM", "sauvegarde_style_route.qml"))
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__),"SENS_NUM", "sauvegarde_style_route.qml"),categories=QgsMapLayer.StyleCategory.Symbology| QgsMapLayer.Labeling)
             self.is_affiche_sens_num = False
         else:
             self.dlg.pushButtonsensNumerisation.setText("Masquer le sens de numerisation")
-            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
-            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "style_sens_numerisation.qml"))
+            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"),categories=QgsMapLayer.StyleCategory.Symbology| QgsMapLayer.Labeling)
+            self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "style_sens_numerisation.qml"),categories=QgsMapLayer.StyleCategory.Symbology| QgsMapLayer.Labeling)
             self.is_affiche_sens_num = True
 
         self.layer.triggerRepaint()
@@ -683,7 +683,7 @@ class RenommeRue:
             result = self.dlg.exec_()
             # fermeture dialogue
             if result == 0:
-                self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
+                self.layer.loadNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"),categories=QgsMapLayer.StyleCategory.Symbology| QgsMapLayer.Labeling)
                 self.layer.triggerRepaint()
                 self.dlgAProposDe.hide()
                 self.insee_commune = ""
