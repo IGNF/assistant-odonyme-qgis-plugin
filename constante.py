@@ -1,7 +1,7 @@
 
 LAYER_ROUTE = "troncon_de_route"
 TITRE = "Assistant odonyme"
-VERSION = "v1.1.2"
+VERSION = "v1.2.0"
 PLUGIN_ESPACE_CO = "ign_espace_collaboratif"
 
 AUTOROUTE = "Type autoroutier"
