@@ -34,6 +34,7 @@ from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde
 import os.path
 
+from .modele import *
 from .symbologie import *
 from .fonction import *
 from .cheminpluscourt import *
@@ -600,6 +601,14 @@ class RenommeRue:
         if self.first_start:
             self.first_start = False
             self.dlg = RenommeRueDialog()
+
+            # ******************************
+            champs_manquant, champs_readonly = test_modele(self.layer)
+            self.dlg.pushButton_warning.clicked.connect(lambda: config_modele(champs_manquant, champs_readonly))
+            # self.dlg.pushButton_warning.hide()
+            if len(champs_manquant) == 0:
+                self.dlg.pushButton_warning.setStyleSheet("qproperty-icon: none;")
+            # ******************************
 
             self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
