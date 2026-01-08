@@ -685,20 +685,17 @@ class RenommeRue:
 
             # ********************************************
             # test modele et rendre editable les widgets ou non
+            widgets = {
+                ALIAS_G: self.dlg.lineEditAliasG,
+                ALIAS_D: self.dlg.lineEditAliasD,
+                NOM_COLLAB_G: self.dlg.comboBoxNomRueGauche,
+                NOM_COLLAB_D: self.dlg.comboBoxNomRueDroite,
+            }
             list_champ_manquant,dico_champ_readonly = test_modele(self.layer)
-            for champ,isreadonly in dico_champ_readonly.items():
-                if champ == ALIAS_G and isreadonly:
-                    self.dlg.lineEditAliasG.setStyleSheet("")
-                    self.dlg.lineEditAliasG.setEnabled(False)
-                if champ == ALIAS_D and isreadonly:
-                    self.dlg.lineEditAliasD.setStyleSheet("")
-                    self.dlg.lineEditAliasD.setEnabled(False)
-                if champ == NOM_COLLAB_G and isreadonly:
-                    self.dlg.comboBoxNomRueGauche.setStyleSheet("")
-                    self.dlg.comboBoxNomRueGauche.setEnabled(False)
-                if champ == NOM_COLLAB_D and isreadonly:
-                    self.dlg.comboBoxNomRueDroite.setStyleSheet("")
-                    self.dlg.comboBoxNomRueDroite.setEnabled(False)
+            for champ, widget in widgets.items():
+                if dico_champ_readonly.get(champ, False):  # True si readonly, False sinon
+                    widget.setStyleSheet("")  # remet le style par défaut
+                    widget.setEnabled(False)
             # ********************************************
 
             self.dlg.setParent(self.iface.mainWindow())
