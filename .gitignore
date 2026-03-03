@@ -1,9 +1,10 @@
+# Ignorer le dossier __pycache__/
 __pycache__/
+test/
+scripts/
 help/
 i18n/
 .idea/
-scripts/
-SENS_NUM/sauvegarde_style_route.qml
-SENS_NUM/style_sens_numerisation.qml
+
 
 GitGestion.exe

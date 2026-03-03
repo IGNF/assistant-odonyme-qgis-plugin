@@ -10,7 +10,7 @@ version=1.2.0
 author=PECHEUR Gérôme (IGN)
 email=gerome.pecheur@ign.fr
 
-about=Provide a brief description of the plugin and its purpose.
+# about=Provide a brief description of the plugin and its purpose.
 
 tracker=http://bugs
 repository=http://repo
