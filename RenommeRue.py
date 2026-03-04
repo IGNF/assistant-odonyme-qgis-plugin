@@ -707,6 +707,11 @@ class RenommeRue:
             result = self.dlg.exec_()
             # fermeture dialogue
             if result == 0:
+                # on deconnecte le signal en quittant
+                try:
+                    self.iface.mapCanvas().selectionChanged.disconnect(self.actualiserSelection)
+                except TypeError:
+                    pass  # aucune connexion existante
                 suppr_symb_sens_num(self.layer)
                 self.layer.triggerRepaint()
                 self.dlgAProposDe.hide()
