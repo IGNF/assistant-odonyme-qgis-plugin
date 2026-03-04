@@ -615,9 +615,9 @@ class RenommeRue:
             self.dlgAProposDe = Aproposde()
             self.dlgAProposDe.setWindowFlags(Qt.WindowStaysOnTopHint)
             self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
-            self.dlgAProposDe.setWindowTitle(f"{TITRE} {VERSION}")
+            self.dlgAProposDe.setWindowTitle(f"{TITRE}")
 
-            self.dlg.setWindowTitle(f"{TITRE} {VERSION}")
+            self.dlg.setWindowTitle(f"{TITRE}")
             self.dlg.label_nom_rue_droite.setStyleSheet(CUSTOM_WIDGETS[3])
             self.dlg.label_nom_rue_gauche.setStyleSheet(CUSTOM_WIDGETS[3])
 
