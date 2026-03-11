@@ -2,6 +2,8 @@
 LAYER_ROUTE = "troncon_de_route"
 TITRE = "Assistant odonyme"
 PLUGIN_ESPACE_CO = "ign_espace_collaboratif"
+PLUGIN_CHE_PLUS_COURT = "IGN_chemin_le_plus_court"
+PLUGIN_CHE_SENS_NUM = "IGN_sens_numerisation"
 
 AUTOROUTE = "Type autoroutier"
 RTE_1_CHAUSSEE = "Route à 1 chaussée"

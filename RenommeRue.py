@@ -22,22 +22,19 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsExpression,Qgis,QgsMapLayer
+from qgis.core import QgsExpression,Qgis,QgsFeatureRequest
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
 from qgis.analysis import *
 
-# Initialize Qt resources from file resources.py
-from .resources import *
-# Import the code for the dialog
 from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde
 import os.path
 
+from qgis.PyQt.QtGui import QGuiApplication
+from qgis.utils import plugins
 from .modele import *
-from .symbologie import *
 from .fonction import *
-from .cheminpluscourt import *
 from .constante import *
 from .event import *
 
@@ -75,12 +72,28 @@ class RenommeRue:
             self.layer = self.iface.activeLayer()
             return True
 
+    def affiche_sens_num(self):
+        try:
+            processing_plugin = plugins[PLUGIN_CHE_SENS_NUM]
+            processing_plugin.run()
+        except KeyError:
+            QMessageBox.warning(None, "Attention",
+                f"Le plugin {PLUGIN_CHE_SENS_NUM} n'est pas installé ou pas activé\n"
+                f"- Veuillez l'activer dans le menu \"Installer/Gérer les extensions de QGIS\"")
+
     def runchepluscourt(self):
         if not self.insee_commune:
             afficheerreur("Veuillez renseigner le code INSEE coorespondant à la commune en cours de traitement")
         else:
-            self.cheminpluscourt.cheminpluscourt()
-            # ne selctionner que les troncons avec le bon INSEE
+            try:
+                processing_plugin = plugins[PLUGIN_CHE_PLUS_COURT]
+                processing_plugin.run()
+            except KeyError:
+                QMessageBox.warning(None, "Attention",
+                                    f"Le plugin {PLUGIN_CHE_PLUS_COURT} n'est pas installé ou pas activé\n"
+                                    f"- Veuillez l'activer dans le menu \"Installer/Gérer les extensions de QGIS\"")
+            QTimer.singleShot(0, self.actualiserSelection)
+            # # ne selctionner que les troncons avec le bon INSEE
             id_insseG = self.layer.fields().indexFromName(INSEE_G)
             id_insseD = self.layer.fields().indexFromName(INSEE_D)
             listid = []
@@ -419,11 +432,8 @@ class RenommeRue:
 
 
     def re_seltroncon(self, listcleabs):
-        # TODO re_seltroncon
-
         # on selectionne les troncons avec les cleabs recuperés avant les changements d'attributs
         for cleabs in listcleabs:
-            # self.layer.selectByExpression("{} = '{}'".format(CLEABS, cleabs), QgsVectorLayer.AddToSelection)
             self.layer.selectByExpression(f"{CLEABS} = '{cleabs}'", QgsVectorLayer.AddToSelection)
 
     def afficheAProposeDe(self):
@@ -498,29 +508,10 @@ class RenommeRue:
         else:
             self.dlg.pushButtonModifier.setEnabled(False)
 
-    def afficher_sens_num(self):
-        #     TODO afficher_sens_num
-        if self.is_affiche_sens_num:
-            self.dlg.pushButtonsensNumerisation.setText("Afficher le sens de numerisation")
-            suppr_symb_sens_num(self.layer)
-            self.is_affiche_sens_num = False
-        else:
-            self.dlg.pushButtonsensNumerisation.setText("Masquer le sens de numerisation")
-            add_symb_sens_num(self.layer)
-            self.is_affiche_sens_num = True
-
-        self.layer.triggerRepaint()
-
     def __init__(self, iface):
         # zone de texte perso du combobox
         self.custom_line_edit_combo_g = None
         self.custom_line_edit_combo_d = None
-
-        # boolean pour afficher/masquer le sens de numerisation
-        self.is_affiche_sens_num = False
-
-        # copie du dictionnaire de selection AVANT de renommer pour gerer le undo sur les id
-        self.cheminpluscourt = None
 
         self.isnom_G_modifie = False
         self.isnom_D_modifie = False
@@ -604,12 +595,11 @@ class RenommeRue:
             # ******************************
             champs_manquant, champs_readonly = test_modele(self.layer)
             self.dlg.pushButton_warning.clicked.connect(lambda: config_modele(champs_manquant, champs_readonly))
-            # self.dlg.pushButton_warning.hide()
             if len(champs_manquant) == 0:
                 self.dlg.pushButton_warning.setStyleSheet("qproperty-icon: none;")
             # ******************************
 
-            self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
+            # self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
             self.dlgAProposDe = Aproposde()
             self.dlgAProposDe.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -678,7 +668,7 @@ class RenommeRue:
             self.dlg.pushButtonAide.clicked.connect(self.afficheAProposeDe)
 
             # bouton sens de numérisation
-            self.dlg.pushButtonsensNumerisation.clicked.connect(self.afficher_sens_num)
+            self.dlg.pushButtonsensNumerisation.clicked.connect(self.affiche_sens_num)
             # sauvegarde du style de la couche route
             self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
 
@@ -701,7 +691,6 @@ class RenommeRue:
             self.dlg.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
             self.dlg.show()
 
-
             # Run the dialog event loop
             result = self.dlg.exec_()
             # fermeture dialogue
@@ -711,11 +700,18 @@ class RenommeRue:
                     self.iface.mapCanvas().selectionChanged.disconnect(self.actualiserSelection)
                 except TypeError:
                     pass  # aucune connexion existante
-                suppr_symb_sens_num(self.layer)
+
+                # si on quitte, on remet la vue sans le sens de numérisation via le plugin
+                try:
+                    processing_plugin = plugins[PLUGIN_CHE_SENS_NUM]
+                    processing_plugin.suppr_symb_sens_num(self.layer)
+                except:
+                    pass
+
+                # suppr_symb_sens_num(self.layer)
                 self.layer.triggerRepaint()
                 self.dlgAProposDe.hide()
                 self.insee_commune = ""
-                self.is_affiche_sens_num = False
                 # self.dialvisible = False
             self.first_start = True
             # See if OK was pressed
