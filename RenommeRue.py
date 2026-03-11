@@ -217,7 +217,6 @@ class RenommeRue:
                     # nom collabg droit
                     self.layer.changeAttributeValue(ident[0], iDnomruegdroite,self.dlg.comboBoxNomRueDroite.currentText())
 
-            print(gotransactionAliasGauche," : ",self.isalias_g_modifie )
             if gotransactionAliasGauche and self.isalias_g_modifie:
                 self.layer.changeAttributeValue(ident[0], idaliasgauche, self.dlg.lineEditAliasG.text())
             if gotransactionAliasDroit and self.isalias_d_modifie:
@@ -479,7 +478,7 @@ class RenommeRue:
             self.isnom_D_modifie = False
 
         # alias gauche est modifié
-        if self.aliasGSelection != self.dlg.lineEditAliasG.text():
+        if self.aliasGSelection != self.dlg.lineEditAliasG.text() and self.dlg.lineEditAliasG.text() != "***":
             self.dlg.lineEditAliasG.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isalias_g_modifie = True
         else:
@@ -487,7 +486,7 @@ class RenommeRue:
             self.isalias_g_modifie = False
 
         # alias droit est modifié
-        if self.aliasDSelection != self.dlg.lineEditAliasD.text():
+        if self.aliasDSelection != self.dlg.lineEditAliasD.text() and self.dlg.lineEditAliasD.text() != "***":
             self.dlg.lineEditAliasD.setStyleSheet(CUSTOM_WIDGETS[0])
             self.isalias_d_modifie = True
         else:
