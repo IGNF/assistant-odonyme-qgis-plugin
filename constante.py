@@ -27,12 +27,13 @@ NATURE = "nature"
 CLEABS = "cleabs"
 
 
-# 0 : text rouge
+# 0 : text rouge #db1515
+# 0 : text bleu #0002ff
 # 1 : text vert
 # 2 : fond blanc
 # 3 : label
 
-CUSTOM_WIDGETS = ("color: #db1515 ;font-weight: bold;border: solid #db1515;border-width : 1px",
+CUSTOM_WIDGETS = ("color: #0002ff ;font-weight: bold;border: solid #0002ff;border-width : 1px",
                   "color: #1a6d0f ;font-weight: bold;border: solid #1a6d0f;border-width : 1px",
                   "background-color:#ffffff;border: solid black;border-width : 2px",
                   "background-color: #cccccc",

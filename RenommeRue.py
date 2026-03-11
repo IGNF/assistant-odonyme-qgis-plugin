@@ -238,6 +238,8 @@ class RenommeRue:
         QGuiApplication.restoreOverrideCursor()
         self.afficheMessageBar(
             f"Les modifications ont été effectués sur : {self.layer.selectedFeatureCount()} tronçon(s)")
+        # rafraichir les couleurs apres validation
+        self.actualiserSelection()
 
     # est-ce un troncon modifiable (rte 1 chaussée, rte 2 chaussées, rte empierré, chemin, sentier, autoroute,bretelle,escalier) ?
     def istroncon(self, selection):
