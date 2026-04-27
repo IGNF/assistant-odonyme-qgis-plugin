@@ -91,7 +91,7 @@ Allez dans **Extensions/Installer/Gérer les extensions**, cliquez sur **Install
   
 
 <div  style="text-align: center;"> 
-	<img  src="Image3.png" height="300"/> 
+	<img  src="Image3.png" /> 
 </div>  
 
 Le bouton ![Image4](Image4.png) permet d’afficher l’historique des versions et d’ouvrir la documentation du plugin.  
@@ -112,9 +112,8 @@ La case à cocher ![Image10](Image10.png) permet de modifier ou non simultanéme
 
 Le code insee de la commune limite les actions aux seuls tronçons de la commune indiquée (chemin le plus court, même nom …)  
 
-
 <div  style="text-align: center;"> 
-	<img  src="Image23.jpg" height = 350/> 
+	<img  src="Image23.jpg" height = 300/> 
 </div>
 A l’ouverture de l’outil, il y a une vérification de la présence dans le projet des couches nécessaires.  
 Afficher l’état du modèle permet de vérifier les permissions sur chaque attribut.  
@@ -150,14 +149,14 @@ Utile lorsque l’on travaille en limite de commune afin de savoir quel nom coll
 
   
 <div  style="background-color: white; border: 1px solid black; padding: 10px; text-align: justify;">
-  <h2 id="6-modification" style="color: #00ADC5">6. Modification</h2>
+  <h2 id="6-modifications" style="color: #00ADC5">6. Modifications</h2>
 </div>  
 Une fois la sélection faite, il suffit de renseigner un nouveau nom collaboratif gauche et/ou droit.
 Le (ou les) nom collaboratif à modifier apparaît en bleu.  
 
 
 <div  style="text-align: left;"> 
-	<img  src="Image14.png" height = 300/> 
+	<img  src="Image14.png" /> 
 </div>
 
 Si on désire modifier simultanément les 2 noms collaboratifs, il faut activer le « verrou » ![Image10](Image10.png)  sinon les 2 champs seront indépendants.  
@@ -166,7 +165,7 @@ Si on désire modifier simultanément les 2 noms collaboratifs, il faut activer 
 Si les tronçons sélectionnés n’ont pas le même nom collaboratif (gauche ou droit) un panneau point d’exclamation le signale. Il faut dérouler la liste des noms et sélectionner celui choisi.  
 
 <div  style="text-align: left;"> 
-	<img  src="Image15.png" height = 300/> 
+	<img  src="Image15.png" /> 
 </div>
 
 
@@ -174,8 +173,7 @@ Si les tronçons sélectionnés n’ont pas le même nom collaboratif (gauche ou
   <h2 id="7-renommage" style="color: #00ADC5">7. Renommage</h2>
 </div>
 
-Pour valider les modifications faites dans l’outil il faut cliquer sur  
-![Image16](Image16.png) 
+Pour valider les modifications faites dans l’outil il faut cliquer sur ![Image16](Image16.png)  
 Un message QGIS confirme la prise en compte des modifications.  
 
 ![Image17](Image17.png)  
@@ -213,7 +211,6 @@ Cette boîte permet de suivre l’évolution des différentes versions ainsi que
 
 Ouvrir l’invite de commande, se placer dans le répertoire « bin » de l’installation de QGIS :  
 Exemple :  
-
 
 ![Image21](Image21.png)  
 
