@@ -36,9 +36,9 @@ def affiches_spec_bdtopo():
 
 def afficheerreur(text, titre=TITRE):
     msg = QMessageBox()
-    msg.setIcon(QMessageBox.Warning)
+    msg.setIcon(Warning)
     msg.setWindowTitle(titre)
-    msg.setStandardButtons(QMessageBox.Ok)
+    msg.setStandardButtons(Ok)
     msg.setText(text)
     msg.setWindowFlags(WindowStaysOnTopHint)
     msg.exec()
@@ -49,9 +49,9 @@ def affichemessageAvertissement(text, titre):
     msg.setIcon(QMessageBox.Warning)
     msg.setWindowTitle(titre)
     msg.setText(text)
-    btnAnnuler = msg.addButton("Annuler", QMessageBox.YesRole)
+    btnAnnuler = msg.addButton("Annuler", YesRole)
     btnAnnuler.setStyleSheet("color:red ; font-weight: bold")
-    btnValider = msg.addButton("valider les modifications", QMessageBox.AcceptRole)
+    btnValider = msg.addButton("valider les modifications", AcceptRole)
     btnValider.setStyleSheet("color:green ; font-weight: bold")
     msg.setWindowFlags(WindowStaysOnTopHint)
     msg.exec()

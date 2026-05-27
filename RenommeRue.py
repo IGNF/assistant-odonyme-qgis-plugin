@@ -24,7 +24,6 @@
 from qgis.core import QgsExpression,Qgis,QgsFeatureRequest,QgsVectorLayer,QgsProject
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
-from qgis.analysis import *
 
 from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde

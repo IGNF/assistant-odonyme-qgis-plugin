@@ -1,3 +1,4 @@
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 
@@ -15,9 +16,10 @@ try :
     # MatchExactly = Qt.MatchFlag.MatchExactly
     # RightSide = QTabBar.ButtonPosition.RightSide
     # LeftSide = QTabBar.ButtonPosition.LeftSide
-    # Warning = QMessageBox.Icon.Warning
-    # YesRole = QMessageBox.ButtonRole.YesRole
-    # AcceptRole = QMessageBox.ButtonRole.AcceptRole
+    Warning = QMessageBox.Icon.Warning
+    YesRole = QMessageBox.ButtonRole.YesRole
+    AcceptRole = QMessageBox.ButtonRole.AcceptRole
+    Ok = QMessageBox.StandardButton.Ok
     # NoSelection = QAbstractItemView.SelectionMode.NoSelection
     # NoFocus = Qt.FocusPolicy.NoFocus
     # DisplayRole = Qt.ItemDataRole.DisplayRole
@@ -41,9 +43,10 @@ except :
     # MatchExactly = Qt.MatchFlag.MatchExactly
     # RightSide = QTabBar.RightSide
     # LeftSide = QTabBar.LeftSide
-    # Warning = QMessageBox.Warning
-    # YesRole = QMessageBox.YesRole
-    # AcceptRole = QMessageBox.AcceptRole
+    Warning = QMessageBox.Warning
+    YesRole = QMessageBox.YesRole
+    AcceptRole = QMessageBox.AcceptRole
+    Ok = QMessageBox.Ok
     # NoSelection = QListWidget.NoSelection
     # NoFocus = Qt.NoFocus
     # DisplayRole = Qt.DisplayRole
