@@ -6,14 +6,15 @@
 name=IGN Contribution directe BDuni (ODONYME)
 qgisMinimumVersion=3.0
 description=plugin de renommage des noms de rues droite et/ou gauche
-version=1.4.0
+version=1.4.0_recette
 author=PECHEUR Gérôme (IGN)
 email=gerome.pecheur@ign.fr
 
 # about=Provide a brief description of the plugin and its purpose.
 
-tracker=http://bugs
-repository=http://repo
+homepage=https://ignf.github.io/assistant-odonyme-qgis-plugin/
+tracker=https://github.com/IGNF/assistant-odonyme-qgis-plugin/issues
+repository=https://github.com/IGNF/assistant-odonyme-qgis-plugin
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,7 +26,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python
 
-homepage=http://homepage
+
 category=Plugins
 icon=icons/icon_principal.png
 # experimental flag

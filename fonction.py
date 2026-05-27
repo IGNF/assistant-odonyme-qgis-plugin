@@ -1,13 +1,10 @@
 import os.path
+import webbrowser
+
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis.PyQt.QtCore import Qt
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsProject
 from .constante import *
-import subprocess
-
-
-# FOND_DIAL = "background-color:#d3ddff"
+from .mapping_version import *
 
 def ecrirelog(text):
     ficlog = open(os.path.dirname(__file__) + "/log.txt", "a")
@@ -30,11 +27,7 @@ def ecrire_debut_fichier(text):
 
 
 def afficheDoc():
-    fichier = os.path.join(os.path.dirname(__file__), "contribution directe (odonyme).pdf")
-    if not os.path.isfile(fichier):
-        afficheerreur("La documentation est introuvable", "Information")
-    else:
-        subprocess.Popen(['start', '', fichier], shell=True)
+    webbrowser.open("https://ignf.github.io/assistant-odonyme-qgis-plugin/")
 
 def affiches_spec_bdtopo():
     import webbrowser
@@ -47,7 +40,7 @@ def afficheerreur(text, titre=TITRE):
     msg.setWindowTitle(titre)
     msg.setStandardButtons(QMessageBox.Ok)
     msg.setText(text)
-    msg.setWindowFlags(Qt.WindowStaysOnTopHint)
+    msg.setWindowFlags(WindowStaysOnTopHint)
     msg.exec()
 
 
@@ -60,7 +53,7 @@ def affichemessageAvertissement(text, titre):
     btnAnnuler.setStyleSheet("color:red ; font-weight: bold")
     btnValider = msg.addButton("valider les modifications", QMessageBox.AcceptRole)
     btnValider.setStyleSheet("color:green ; font-weight: bold")
-    msg.setWindowFlags(Qt.WindowStaysOnTopHint)
+    msg.setWindowFlags(WindowStaysOnTopHint)
     msg.exec()
 
     if msg.clickedButton() == btnAnnuler:

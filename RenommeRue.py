@@ -21,8 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-
-from qgis.core import QgsExpression,Qgis,QgsFeatureRequest
+from qgis.core import QgsExpression,Qgis,QgsFeatureRequest,QgsVectorLayer,QgsProject
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
 from qgis.analysis import *
@@ -38,23 +37,6 @@ from .fonction import *
 from .constante import *
 from .event import *
 
-# recuperation de l'id de la transaction (à partir du plugin espace co)
-def getidtransaction():
-    from qgis.utils import plugins
-    idtransaction = None
-    try:
-        processing_plugin = plugins[PLUGIN_ESPACE_CO]
-        try:
-            idtransaction = processing_plugin.getlibelletransaction()
-        except AttributeError:
-            idtransaction = "Récuperation en cours de développement"
-    except KeyError:
-        pass
-
-    if idtransaction is None:
-        return "Pas de transaction vers la BDUNI (travail hors ligne)"
-    else:
-        return idtransaction
 
 class RenommeRue:
     """QGIS Plugin Implementation."""
@@ -118,7 +100,7 @@ class RenommeRue:
             return
 
         # TODO sel_memenom
-        QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+        QGuiApplication.setOverrideCursor(WaitCursor)
         # definition des parametres de selection (INSEE et NOM RUE)
         id_nom_rue_g = self.layer.fields().indexFromName(NOM_COLLAB_G)
         id_nom_rue_d = self.layer.fields().indexFromName(NOM_COLLAB_D)
@@ -163,7 +145,7 @@ class RenommeRue:
         QGuiApplication.restoreOverrideCursor()
 
     def renomme(self):
-        QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+        QGuiApplication.setOverrideCursor(WaitCursor)
         if self.insee_commune == "":
             afficheerreur("Veuillez renseigner l'INSEE de la commune à traiter", "Erreur")
             return
@@ -390,8 +372,8 @@ class RenommeRue:
         self.aliasDSelection = self.dlg.lineEditAliasD.text()
 
         # on trie les combobox par ordre alphabetique
-        self.dlg.comboBoxNomRueGauche.model().sort(0, QtCore.Qt.AscendingOrder)
-        self.dlg.comboBoxNomRueDroite.model().sort(0, QtCore.Qt.AscendingOrder)
+        self.dlg.comboBoxNomRueGauche.model().sort(0, AscendingOrder)
+        self.dlg.comboBoxNomRueDroite.model().sort(0, AscendingOrder)
 
         # si on trouve un nombre d'occurences different du nombre des noms de rues = tous les noms ne sont pas
         # identiques
@@ -604,7 +586,7 @@ class RenommeRue:
             # self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
             self.dlgAProposDe = Aproposde()
-            self.dlgAProposDe.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.dlgAProposDe.setWindowFlags(WindowStaysOnTopHint)
             self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
             self.dlgAProposDe.setWindowTitle(f"{TITRE}")
 
@@ -690,11 +672,11 @@ class RenommeRue:
             # ********************************************
 
             self.dlg.setParent(self.iface.mainWindow())
-            self.dlg.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
+            self.dlg.setWindowFlags(Dialog |WindowTitleHint | WindowCloseButtonHint)
             self.dlg.show()
 
             # Run the dialog event loop
-            result = self.dlg.exec_()
+            result = self.dlg.exec()
             # fermeture dialogue
             if result == 0:
                 # on deconnecte le signal en quittant
