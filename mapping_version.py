@@ -1,4 +1,4 @@
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox,QTextEdit
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 
@@ -29,6 +29,7 @@ try :
     AlignCenter = Qt.AlignmentFlag.AlignCenter
     WaitCursor = Qt.CursorShape.WaitCursor
     AscendingOrder = QtCore.Qt.SortOrder.AscendingOrder
+    NoWrap = QTextEdit.LineWrapMode.NoWrap
 # QT5
 except :
     Dialog = Qt.Dialog
@@ -56,3 +57,4 @@ except :
     AlignCenter = Qt.AlignCenter
     WaitCursor = Qt.WaitCursor
     AscendingOrder = QtCore.Qt.AscendingOrder
+    NoWrap = QTextEdit.NoWrap

@@ -1,6 +1,6 @@
 import os
 
-from qgis.PyQt.QtWidgets import QDialog, QLabel,QTextEdit
+from qgis.PyQt.QtWidgets import QDialog, QLabel
 from qgis.PyQt.uic import loadUi
 
 from .mapping_version import *
@@ -43,7 +43,7 @@ def config_modele(champs_manquant,champs_readonly):
     dlgConfig.tableWidget_etat_champs.verticalHeader().setDefaultSectionSize(20)
 
     # champs manquants
-    dlgConfig.textEdit_champs_manquants.setLineWrapMode(QTextEdit.NoWrap)
+    dlgConfig.textEdit_champs_manquants.setLineWrapMode(NoWrap)
     for champ in champs_manquant:
         dlgConfig.textEdit_champs_manquants.append(f"<span style = 'color: red'><b>{champ}</b></span>")
 
