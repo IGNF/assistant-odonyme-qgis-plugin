@@ -243,7 +243,7 @@ class RenommeRue:
     def setinsee(self,insee):
         # si insse n'est pas de type entier
         isvalide = True
-        if any(caractere.isalpha() for caractere in insee):
+        if any(caractere.isalpha() for caractere in str(insee)):
             isvalide = False
 
         if self.dlg.lineEditINSEECommune.text() =="" and isvalide:
