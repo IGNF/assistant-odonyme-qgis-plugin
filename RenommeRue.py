@@ -21,11 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
-
-from qgis.core import QgsExpression,Qgis,QgsFeatureRequest
+from qgis.core import QgsExpression,Qgis,QgsFeatureRequest,QgsVectorLayer,QgsProject
 from qgis.PyQt.QtCore import *
 # import pour construction d'un graph
-from qgis.analysis import *
 
 from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde
@@ -38,23 +36,6 @@ from .fonction import *
 from .constante import *
 from .event import *
 
-# recuperation de l'id de la transaction (à partir du plugin espace co)
-def getidtransaction():
-    from qgis.utils import plugins
-    idtransaction = None
-    try:
-        processing_plugin = plugins[PLUGIN_ESPACE_CO]
-        try:
-            idtransaction = processing_plugin.getlibelletransaction()
-        except AttributeError:
-            idtransaction = "Récuperation en cours de développement"
-    except KeyError:
-        pass
-
-    if idtransaction is None:
-        return "Pas de transaction vers la BDUNI (travail hors ligne)"
-    else:
-        return idtransaction
 
 class RenommeRue:
     """QGIS Plugin Implementation."""
@@ -118,7 +99,7 @@ class RenommeRue:
             return
 
         # TODO sel_memenom
-        QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+        QGuiApplication.setOverrideCursor(WaitCursor)
         # definition des parametres de selection (INSEE et NOM RUE)
         id_nom_rue_g = self.layer.fields().indexFromName(NOM_COLLAB_G)
         id_nom_rue_d = self.layer.fields().indexFromName(NOM_COLLAB_D)
@@ -163,7 +144,7 @@ class RenommeRue:
         QGuiApplication.restoreOverrideCursor()
 
     def renomme(self):
-        QGuiApplication.setOverrideCursor(Qt.WaitCursor)
+        QGuiApplication.setOverrideCursor(WaitCursor)
         if self.insee_commune == "":
             afficheerreur("Veuillez renseigner l'INSEE de la commune à traiter", "Erreur")
             return
@@ -262,7 +243,7 @@ class RenommeRue:
     def setinsee(self,insee):
         # si insse n'est pas de type entier
         isvalide = True
-        if any(caractere.isalpha() for caractere in insee):
+        if any(caractere.isalpha() for caractere in str(insee)):
             isvalide = False
 
         if self.dlg.lineEditINSEECommune.text() =="" and isvalide:
@@ -348,15 +329,9 @@ class RenommeRue:
                                                       attr[idinseeruegauche], attr[idinseeruedroite],
                                                       attr[idaliasgauche],attr[idaliasdroit]]
 
-                # ajout des noms de rues aux listes (pour traiter les occurences)
-                list_nom_rue_d.append(attr[idnomruedroite])
-                list_nom_rue_g.append(attr[idnomruegauche])
-                list_alias_g.append(attr[idaliasgauche])
-                list_alias_d.append(attr[idaliasdroit])
-
-                # test des insee des troncons
+                # test des insee des tronçons
                 # si tous identique on renseigne le lineeditinsee s'il est vide
-                # sinon ca veut dire que l'operateur à choisi manuellement un insee
+                # sinon ça veut dire que l'opérateur a choisi manuellement un insee
                 list_insee.append(attr[idinseeruegauche])
                 list_insee.append(attr[idinseeruedroite])
                 if len(set(list_insee)) == 1:
@@ -364,36 +339,55 @@ class RenommeRue:
                 else:
                     self.setinsee("")
 
-                if attr[idnomruegauche] == NULL:
-                    self.dlg.comboBoxNomRueGauche.addItem("")
-                elif attr[idnomruedroite] == NULL:
-                    self.dlg.comboBoxNomRueDroite.addItem("")
-                elif attr[idaliasgauche] == NULL:
-                    self.dlg.lineEditAliasG.setText("")
-                elif attr[idaliasdroit] == NULL:
-                    self.dlg.lineEditAliasD.setText("")
-                else:
 
-                    self.dlg.comboBoxNomRueGauche.addItem(attr[idnomruegauche])
-                    self.dlg.comboBoxNomRueDroite.addItem(attr[idnomruedroite])
-                    # LineEdit
-                    self.dlg.lineEditAliasG.setText(attr[idaliasgauche])
-                    self.dlg.lineEditAliasD.setText(attr[idaliasdroit])
-                    self.dlg.lineEditBanG.setText(attr[idvoiebangauche])
-                    self.dlg.lineEditBanD.setText(attr[idvoiebandroite])
+                if attr[idnomruegauche] == NULL  or  attr[idnomruegauche] is None or attr[idnomruegauche] == "":
+                    self.dlg.comboBoxNomRueGauche.addItem("")
+                else:
+                    self.dlg.comboBoxNomRueGauche.addItem(str(attr[idnomruegauche]))
+                    list_nom_rue_g.append(attr[idnomruegauche])
+
+                if attr[idnomruedroite] == NULL or attr[idnomruedroite] is None or attr[idnomruedroite] == "":
+                    self.dlg.comboBoxNomRueDroite.addItem("")
+                else:
+                    self.dlg.comboBoxNomRueDroite.addItem(str(attr[idnomruedroite]))
+                    list_nom_rue_d.append(attr[idnomruedroite])
+
+                if attr[idaliasgauche] == NULL or attr[idaliasgauche] is None or attr[idaliasgauche] == "":
+                    self.dlg.lineEditAliasG.setText("")
+                    list_alias_g.append("")
+                else:
+                    self.dlg.lineEditAliasG.setText(str(attr[idaliasgauche]))
+                    list_alias_g.append(attr[idaliasgauche])
+
+                if attr[idaliasdroit] == NULL or attr[idaliasdroit] is None or attr[idaliasdroit] == "":
+                    self.dlg.lineEditAliasD.setText("")
+                    list_alias_d.append("")
+                else:
+                    self.dlg.lineEditAliasD.setText(str(attr[idaliasdroit]))
+                    list_alias_d.append(attr[idaliasdroit])
+
+                if attr[idvoiebangauche] == NULL or attr[idvoiebangauche] is None or attr[idvoiebangauche] == "":
+                    self.dlg.lineEditBanG.setText("")
+                else:
+                    self.dlg.lineEditBanG.setText(str(attr[idvoiebangauche]))
+
+                if attr[idvoiebandroite] == NULL or attr[idvoiebandroite] is None or attr[idvoiebandroite] == "":
+                    self.dlg.lineEditBanD.setText("")
+                else:
+                    self.dlg.lineEditBanD.setText(str(attr[idvoiebandroite]))
 
         # recuperation du nom AVANT changement dans le combobox et edit pour
-        # gerer si on a remis celui initialement.
+        # gérer si on a remis celui initialement.
         self.nomrueGSelection = self.dlg.comboBoxNomRueGauche.currentText()
         self.nomrueDselection = self.dlg.comboBoxNomRueDroite.currentText()
         self.aliasGSelection = self.dlg.lineEditAliasG.text()
         self.aliasDSelection = self.dlg.lineEditAliasD.text()
 
-        # on trie les combobox par ordre alphabetique
-        self.dlg.comboBoxNomRueGauche.model().sort(0, QtCore.Qt.AscendingOrder)
-        self.dlg.comboBoxNomRueDroite.model().sort(0, QtCore.Qt.AscendingOrder)
+        # on trie les combobox par ordre alphabétique
+        self.dlg.comboBoxNomRueGauche.model().sort(0, AscendingOrder)
+        self.dlg.comboBoxNomRueDroite.model().sort(0, AscendingOrder)
 
-        # si on trouve un nombre d'occurences different du nombre des noms de rues = tous les noms ne sont pas
+        # si on trouve un nombre d'occurrences different du nombre des noms de rues = tous les noms ne sont pas
         # identiques
         nb_occurence_nom_d = list_nom_rue_d.count(self.dlg.comboBoxNomRueDroite.currentText())
         nb_occurence_nom_g = list_nom_rue_g.count(self.dlg.comboBoxNomRueGauche.currentText())
@@ -401,23 +395,23 @@ class RenommeRue:
         nb_occurence_alias_d = list_alias_d.count(self.dlg.lineEditAliasD.text())
         if nb_occurence_nom_d != len(list_nom_rue_d):
             self.dlg.labelexclamation_d.show()
-            # l'affichage des alias et des ban est basé sur les occurences de la liste des NOM DE RUES
+            # l'affichage des alias et des ban est basé sur les occurrences de la liste des NOM DE RUES
             self.dlg.lineEditBanD.setText("")
-            self.dlg.lineEditAliasD.setText("")
+            # self.dlg.lineEditAliasD.setText("")
         else:
             self.dlg.labelexclamation_d.hide()
         if nb_occurence_nom_g != len(list_nom_rue_g):
             self.dlg.labelexclamation_g.show()
-            # l'affichage des alias et des ban est basé sur les occurences de la liste des NOM DE RUES
+            # l'affichage des alias et des ban est basé sur les occurrences de la liste des NOM DE RUES
             self.dlg.lineEditBanG.setText("")
-            self.dlg.lineEditAliasG.setText("")
+            # self.dlg.lineEditAliasG.setText("")
         else:
             self.dlg.labelexclamation_g.hide()
+
         if nb_occurence_alias_g != len(list_alias_g):
             self.dlg.lineEditAliasG.setText("***")
         if nb_occurence_alias_d != len(list_alias_d):
             self.dlg.lineEditAliasD.setText("***")
-
 
         self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
         self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
@@ -604,7 +598,7 @@ class RenommeRue:
             # self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
             self.dlgAProposDe = Aproposde()
-            self.dlgAProposDe.setWindowFlags(Qt.WindowStaysOnTopHint)
+            self.dlgAProposDe.setWindowFlags(WindowStaysOnTopHint)
             self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
             self.dlgAProposDe.setWindowTitle(f"{TITRE}")
 
@@ -690,11 +684,11 @@ class RenommeRue:
             # ********************************************
 
             self.dlg.setParent(self.iface.mainWindow())
-            self.dlg.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
+            self.dlg.setWindowFlags(Dialog |WindowTitleHint | WindowCloseButtonHint)
             self.dlg.show()
 
             # Run the dialog event loop
-            result = self.dlg.exec_()
+            result = self.dlg.exec()
             # fermeture dialogue
             if result == 0:
                 # on deconnecte le signal en quittant
