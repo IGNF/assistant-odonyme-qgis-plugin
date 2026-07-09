@@ -7,7 +7,7 @@ name=IGN Contribution directe BDuni (ODONYME)
 qgisMinimumVersion=3.0
 qgisMaximumVersion=4.99
 description=plugin de renommage des noms de rues droite et/ou gauche
-version=1.4.1
+version=1.4.2
 author=PECHEUR Gérôme (IGN)
 email=gerome.pecheur@ign.fr
 license=GNU AGPL v3
@@ -40,7 +40,7 @@ deprecated=False
 # Since QGIS 3.8, a comma separated list of plugins to be installed
 # (or upgraded) can be specified.
 # Check the documentation for more information.
-# plugin_dependencies=
+plugin_dependencies= IGN PluginsManager
 
 Category of the plugin: Raster, Vector, Database or Web
 # category=

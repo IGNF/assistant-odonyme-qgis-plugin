@@ -11,7 +11,7 @@
 style="width:1.38681in;height:1.47153in"
 alt="logo_IGN_pour_lettre" /></td>
 <td style="font-size: 24px;text-align: center;"><p><strong>Plugin QGis Assistant odonyme</strong></p>
-<p><strong>V1.4.1</strong></p></td>
+<p><strong>V1.4.2</strong></p></td>
 </tr>
 <tr>
 <td style="font-size: 16px;text-align: center;">Développeur  : Gérôme PECHEUR (IGN)</td>
@@ -43,12 +43,15 @@ alt="logo_IGN_pour_lettre" /></td>
 </div>
 
 Version de QGIS 3 : 3.28 ou supérieure.  
-Le plugin « maitre » doit préalablement être installé : 
-[maitre-qgis-plugin sur GitHub](https://github.com/IGNF/maitre-qgis-plugin).
+Le plugin « PluginsManager » doit préalablement être installé : 
+[PluginsManager-qgis-plugin sur GitHub](https://github.com/IGNF/maitre-qgis-plugin/releases/download/version_finale/PluginsManager.zip)
 
-Ce plugin est utilisable sur la couche éditable Tronçon_de_route de la BDTopo.  
-Le fonctionnement de certaines fonctionnalités nécessite l’installation des plugins IGN 
-(IGN)chemin-le-plus-court-qgis-plugin
+Ce plugin est utilisable sur la couche éditable Tronçon_de_route de la BDTopo. 
+
+Le fonctionnement de certaines fonctionnalités nécessite l’installation de :
+- [ShortestPath-qgis-plugin sur GitHub](https://github.com/IGNF/ShortestPath-qgis-plugin/releases/download/version_finale/IGN_ShortestPath.zip)  
+- [DigitizingDirection-qgis-plugin sur GitHub](https://github.com/IGNF/DigitizingDirection-qgis-plugin/releases/download/version_finale/IGN_DigitizingDirection.zip)
+
 
 Si le package « openpyxl » n’est pas installé sur le poste, le message d’erreur ci-dessous apparaît lors d’une transaction.  
 
@@ -96,10 +99,10 @@ Allez dans **Extensions/Installer/Gérer les extensions**, cliquez sur **Install
 
 Le bouton ![Image4](images/Image4.png) permet d’afficher l’historique des versions et d’ouvrir la documentation du plugin.  
 Le bouton ![Image5](images/Image5.png) affiche ou masque le sens de numérisation des tronçons de route.
-(Nécessite l’installation du plugin IGN Sens de numérisation)  
+(Nécessite l’installation du plugin "DigitizingDirection")  
 
 Le bouton ![Image6](images/Image6.png) permet de sélectionner tous les tronçons de la commune compris entre 2 tronçons sélectionnés.
-(Nécessite l’installation du plugin IGN Chemin le plus court)  
+(Nécessite l’installation du plugin "ShortestPath")  
 
 Le bouton ![Image7](images/Image7.png) permet de sélectionner tous les tronçons de la commune de même nom collaboratif (gauche OU droite).  
 Le bouton ![Image8](images/Image8.png) permet de modifier la couleur des tronçons sélectionnés dans QGIS. Ça peut être utile suivant la symbologie appliquées pour les tronçons dans QGIS.  
