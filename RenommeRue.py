@@ -21,9 +21,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.core import QgsExpression,Qgis,QgsFeatureRequest,QgsVectorLayer,QgsProject
+from qgis.core import QgsExpression,Qgis,QgsFeatureRequest,QgsVectorLayer,QgsProject,QgsApplication
 from qgis.PyQt.QtCore import *
-# import pour construction d'un graph
 
 from .RenommeRue_dialog import RenommeRueDialog
 from .aproposde import Aproposde
@@ -33,9 +32,9 @@ from qgis.PyQt.QtGui import QGuiApplication
 from qgis.utils import plugins
 from .modele import *
 from .fonction import *
-from .constante import *
 from .event import *
-
+from .window_manager import *
+from .mapping_version import *
 
 class RenommeRue:
     """QGIS Plugin Implementation."""
@@ -55,11 +54,11 @@ class RenommeRue:
 
     def affiche_sens_num(self):
         try:
-            processing_plugin = plugins[PLUGIN_CHE_SENS_NUM]
+            processing_plugin = plugins[PLUGIN_SENS_NUM]
             processing_plugin.run()
         except KeyError:
             QMessageBox.warning(None, "Attention",
-                f"Le plugin {PLUGIN_CHE_SENS_NUM} n'est pas installé ou pas activé\n"
+                f"Le plugin {PLUGIN_SENS_NUM} n'est pas installé ou pas activé\n"
                 f"- Veuillez l'activer dans le menu \"Installer/Gérer les extensions de QGIS\"")
 
     def runchepluscourt(self):
@@ -433,7 +432,7 @@ class RenommeRue:
             self.layer.selectByExpression(f"{CLEABS} = '{cleabs}'", QgsVectorLayer.AddToSelection)
 
     def afficheAProposeDe(self):
-        self.dlgAProposDe.show()
+        self.dlgAProposDe.exec()
 
     def lineeditINSEEChange(self):
         self.insee_commune = self.dlg.lineEditINSEECommune.text()
@@ -554,13 +553,44 @@ class RenommeRue:
         return QCoreApplication.translate('RenommeRue', message)
 
     def initGui(self):
-        pass
+        self.iface.projectRead.connect(self.on_project_opened)
+        # événement fermeture de qgis
+        QgsApplication.instance().aboutToQuit.connect(self.fermeture_qgis)
 
     def unload(self):
         pass
 
+    def on_project_opened(self):
+        settings = QSettings(NativeFormat, UserScope, "IGN", TITRE)
+        visible = settings.value("visible", False, type=bool)
+        if visible:
+            self.run()
+
+    def on_dialog_closed(self):
+        # on deconnecte le signal en quittant
+        try:
+            self.iface.mapCanvas().selectionChanged.disconnect(self.actualiserSelection)
+        except TypeError:
+            pass  # aucune connexion existante
+
+        # si on quitte, on remet la vue sans le sens de numérisation via le plugin
+        try:
+            processing_plugin = plugins[PLUGIN_SENS_NUM]
+            processing_plugin.suppr_symb_sens_num(self.layer)
+        except:
+            pass
+        self.layer.triggerRepaint()
+        self.dlgAProposDe.close()
+        sauve_position_dial(self.dlg)
+        self.dlg = None
+
+    def fermeture_qgis(self):
+        sauve_position_dial(self.dlg)
+
     def run(self):
-        """Run method that performs all the real work"""
+        if self.dlg is not None and self.dlg.isVisible():
+            return
+
         if not QgsProject.instance().fileName():
             afficheerreur("Veuillez charger un projet")
             return
@@ -584,134 +614,138 @@ class RenommeRue:
 
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start:
-            self.first_start = False
-            self.dlg = RenommeRueDialog()
+        # if self.first_start:
+        #     self.first_start = False
+        self.dlg = RenommeRueDialog()
 
-            # ******************************
-            champs_manquant, champs_readonly = test_modele(self.layer)
-            self.dlg.pushButton_warning.clicked.connect(lambda: config_modele(champs_manquant, champs_readonly))
-            if len(champs_manquant) == 0:
-                self.dlg.pushButton_warning.setStyleSheet("qproperty-icon: none;")
-            # ******************************
+        # connection de la fermeture du dialogue
+        self.dlg.finished.connect(self.on_dialog_closed)
+        restore_position_dial(self.dlg)
 
-            # self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
+        # ******************************
+        champs_manquant, champs_readonly = test_modele(self.layer)
+        self.dlg.pushButton_warning.clicked.connect(lambda: config_modele(champs_manquant, champs_readonly))
+        if len(champs_manquant) == 0:
+            self.dlg.pushButton_warning.setStyleSheet("qproperty-icon: none;")
+        # ******************************
 
-            self.dlgAProposDe = Aproposde()
-            self.dlgAProposDe.setWindowFlags(WindowStaysOnTopHint)
-            self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
-            self.dlgAProposDe.setWindowTitle(f"{TITRE}")
+        # self.cheminpluscourt = cheminpluscourt(self.iface, self.layer)
 
-            self.dlg.setWindowTitle(f"{TITRE}")
-            self.dlg.label_nom_rue_droite.setStyleSheet(CUSTOM_WIDGETS[3])
-            self.dlg.label_nom_rue_gauche.setStyleSheet(CUSTOM_WIDGETS[3])
+        self.dlgAProposDe = Aproposde()
+        self.dlgAProposDe.setWindowFlags(WindowStaysOnTopHint)
+        self.dlgAProposDe.pushButtonAffichedoc.clicked.connect(afficheDoc)
+        self.dlgAProposDe.setWindowTitle(f"{TITRE}")
 
-            # widget color
-            self.dlg.mColorButton.setColor(self.iface.mapCanvas().selectionColor())
-            self.dlg.mColorButton.colorChanged.connect(self.colorchange)
+        self.dlg.setWindowTitle(f"{TITRE}")
+        self.dlg.label_nom_rue_droite.setStyleSheet(CUSTOM_WIDGETS[3])
+        self.dlg.label_nom_rue_gauche.setStyleSheet(CUSTOM_WIDGETS[3])
 
-            # redefinir des zones de texte pour chaque combobox
-            # permet de gerer les evenement clic
-            # indispensable pour differencier le remplissage par clavier ou par setText (actualiserselection)
-            self.custom_line_edit_combo_g = CustomLineEdit(self.dlg)
-            self.dlg.comboBoxNomRueGauche.setLineEdit(self.custom_line_edit_combo_g)
-            self.custom_line_edit_combo_d = CustomLineEdit(self.dlg)
-            self.dlg.comboBoxNomRueDroite.setLineEdit(self.custom_line_edit_combo_d)
+        # widget color
+        self.dlg.mColorButton.setColor(self.iface.mapCanvas().selectionColor())
+        self.dlg.mColorButton.colorChanged.connect(self.colorchange)
 
-            # initialisation du label nb selection
-            self.dlg.labelNbTronconSel.setText("")
-            # rempli les QComboBox avec la sélection à l'ouverture du dial
-            self.actualiserSelection()
+        # redefinir des zones de texte pour chaque combobox
+        # permet de gerer les evenement clic
+        # indispensable pour differencier le remplissage par clavier ou par setText (actualiserselection)
+        self.custom_line_edit_combo_g = CustomLineEdit(self.dlg)
+        self.dlg.comboBoxNomRueGauche.setLineEdit(self.custom_line_edit_combo_g)
+        self.custom_line_edit_combo_d = CustomLineEdit(self.dlg)
+        self.dlg.comboBoxNomRueDroite.setLineEdit(self.custom_line_edit_combo_d)
 
-            # À la premiere ouverture, on ne peut pas renommer
-            self.dlg.pushButtonModifier.setEnabled(False)
-            self.dlg.pushButtonModifier.setStyleSheet(CUSTOM_WIDGETS[4])
+        # initialisation du label nb selection
+        self.dlg.labelNbTronconSel.setText("")
+        # rempli les QComboBox avec la sélection à l'ouverture du dial
+        self.actualiserSelection()
 
-            # on masque par defaut le warning exclamation
-            self.dlg.labelexclamation_d.setStyleSheet('color: red')
-            self.dlg.labelexclamation_g.setStyleSheet('color: red')
-            self.dlg.labelexclamation_d.hide()
-            self.dlg.labelexclamation_g.hide()
+        # À la premiere ouverture, on ne peut pas renommer
+        self.dlg.pushButtonModifier.setEnabled(False)
+        self.dlg.pushButtonModifier.setStyleSheet(CUSTOM_WIDGETS[4])
 
-            # checkbox pour lier les nom_collaboratif droit et gauche
-            self.dlg.checkBoxCadenas.setChecked(True)
+        # on masque par defaut le warning exclamation
+        self.dlg.labelexclamation_d.setStyleSheet('color: red')
+        self.dlg.labelexclamation_g.setStyleSheet('color: red')
+        self.dlg.labelexclamation_d.hide()
+        self.dlg.labelexclamation_g.hide()
 
-            # evenement de la combobox
-            self.dlg.comboBoxNomRueGauche.currentTextChanged.connect(self.comboboxchange_gauche)
-            self.dlg.comboBoxNomRueDroite.currentTextChanged.connect(self.comboboxchange_droit)
+        # checkbox pour lier les nom_collaboratif droit et gauche
+        self.dlg.checkBoxCadenas.setChecked(True)
 
-            # evenement du lineEditINSEECommune
-            self.dlg.lineEditINSEECommune.textChanged.connect(self.lineeditINSEEChange)
-            self.dlg.lineEditINSEECommune.setStyleSheet(CUSTOM_WIDGETS[2])
+        # evenement de la combobox
+        self.dlg.comboBoxNomRueGauche.currentTextChanged.connect(self.comboboxchange_gauche)
+        self.dlg.comboBoxNomRueDroite.currentTextChanged.connect(self.comboboxchange_droit)
 
-            # evenement des lineedit alias
-            self.dlg.lineEditAliasG.textChanged.connect(self.lineeditAliasGChange)
-            self.dlg.lineEditAliasD.textChanged.connect(self.lineeditAliasDChange)
+        # evenement du lineEditINSEECommune
+        self.dlg.lineEditINSEECommune.textChanged.connect(self.lineeditINSEEChange)
+        self.dlg.lineEditINSEECommune.setStyleSheet(CUSTOM_WIDGETS[2])
 
-            self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
-            self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
+        # evenement des lineedit alias
+        self.dlg.lineEditAliasG.textChanged.connect(self.lineeditAliasGChange)
+        self.dlg.lineEditAliasD.textChanged.connect(self.lineeditAliasDChange)
 
-            # Bouton : renomme la rue
-            self.dlg.pushButtonModifier.clicked.connect(self.renomme)
+        self.dlg.comboBoxNomRueGauche.setStyleSheet(CUSTOM_WIDGETS[1])
+        self.dlg.comboBoxNomRueDroite.setStyleSheet(CUSTOM_WIDGETS[1])
 
-            # Bouton de selection du chemin le plus court entre 2 troncons
-            self.dlg.pushButtonTrajCourt.clicked.connect(self.runchepluscourt)
+        # Bouton : renomme la rue
+        self.dlg.pushButtonModifier.clicked.connect(self.renomme)
 
-            # bouton de selection des troncons portant le meme nom de rue
-            self.dlg.pushButtonmemenom.clicked.connect(self.selmemenom)
+        # Bouton de selection du chemin le plus court entre 2 troncons
+        self.dlg.pushButtonTrajCourt.clicked.connect(self.runchepluscourt)
 
-            # bouton a propos de
-            self.dlg.pushButtonAide.clicked.connect(self.afficheAProposeDe)
+        # bouton de selection des troncons portant le meme nom de rue
+        self.dlg.pushButtonmemenom.clicked.connect(self.selmemenom)
 
-            # bouton sens de numérisation
-            self.dlg.pushButtonsensNumerisation.clicked.connect(self.affiche_sens_num)
-            # sauvegarde du style de la couche route
-            self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
+        # bouton a propos de
+        self.dlg.pushButtonAide.clicked.connect(self.afficheAProposeDe)
 
-            # ********************************************
-            # test modele et rendre editable les widgets ou non
-            widgets = {
-                ALIAS_G: self.dlg.lineEditAliasG,
-                ALIAS_D: self.dlg.lineEditAliasD,
-                NOM_COLLAB_G: self.dlg.comboBoxNomRueGauche,
-                NOM_COLLAB_D: self.dlg.comboBoxNomRueDroite,
-            }
-            list_champ_manquant,dico_champ_readonly = test_modele(self.layer)
-            for champ, widget in widgets.items():
-                if dico_champ_readonly.get(champ, False):  # True si readonly, False sinon
-                    widget.setStyleSheet("")  # remet le style par défaut
-                    widget.setEnabled(False)
-            # ********************************************
+        # bouton sens de numérisation
+        self.dlg.pushButtonsensNumerisation.clicked.connect(self.affiche_sens_num)
+        # sauvegarde du style de la couche route
+        self.layer.saveNamedStyle(os.path.join(os.path.dirname(__file__), "SENS_NUM", "sauvegarde_style_route.qml"))
 
-            self.dlg.setParent(self.iface.mainWindow())
-            self.dlg.setWindowFlags(Dialog |WindowTitleHint | WindowCloseButtonHint)
-            self.dlg.show()
+        # ********************************************
+        # test modele et rendre editable les widgets ou non
+        widgets = {
+            ALIAS_G: self.dlg.lineEditAliasG,
+            ALIAS_D: self.dlg.lineEditAliasD,
+            NOM_COLLAB_G: self.dlg.comboBoxNomRueGauche,
+            NOM_COLLAB_D: self.dlg.comboBoxNomRueDroite,
+        }
+        list_champ_manquant,dico_champ_readonly = test_modele(self.layer)
+        for champ, widget in widgets.items():
+            if dico_champ_readonly.get(champ, False):  # True si readonly, False sinon
+                widget.setStyleSheet("")  # remet le style par défaut
+                widget.setEnabled(False)
+        # ********************************************
 
-            # Run the dialog event loop
-            result = self.dlg.exec()
-            # fermeture dialogue
-            if result == 0:
-                # on deconnecte le signal en quittant
-                try:
-                    self.iface.mapCanvas().selectionChanged.disconnect(self.actualiserSelection)
-                except TypeError:
-                    pass  # aucune connexion existante
+        self.dlg.setParent(self.iface.mainWindow())
+        self.dlg.setWindowFlags(Dialog |WindowTitleHint | WindowCloseButtonHint)
+        self.dlg.show()
 
-                # si on quitte, on remet la vue sans le sens de numérisation via le plugin
-                try:
-                    processing_plugin = plugins[PLUGIN_CHE_SENS_NUM]
-                    processing_plugin.suppr_symb_sens_num(self.layer)
-                except:
-                    pass
-
-                # suppr_symb_sens_num(self.layer)
-                self.layer.triggerRepaint()
-                self.dlgAProposDe.hide()
-                self.insee_commune = ""
-                # self.dialvisible = False
-            self.first_start = True
-            # See if OK was pressed
-            if result:
-                # Do something useful here - delete the line containing pass and
-                # substitute with your code.
-                pass
+            # # Run the dialog event loop
+            # result = self.dlg.exec()
+            # # fermeture dialogue
+            # if result == 0:
+            #     # on deconnecte le signal en quittant
+            #     try:
+            #         self.iface.mapCanvas().selectionChanged.disconnect(self.actualiserSelection)
+            #     except TypeError:
+            #         pass  # aucune connexion existante
+            #
+            #     # si on quitte, on remet la vue sans le sens de numérisation via le plugin
+            #     try:
+            #         processing_plugin = plugins[PLUGIN_SENS_NUM]
+            #         processing_plugin.suppr_symb_sens_num(self.layer)
+            #     except:
+            #         pass
+            #
+            #     # suppr_symb_sens_num(self.layer)
+            #     self.layer.triggerRepaint()
+            #     self.dlgAProposDe.hide()
+            #     self.insee_commune = ""
+            #     # self.dialvisible = False
+            # self.first_start = True
+            # # See if OK was pressed
+            # if result:
+            #     # Do something useful here - delete the line containing pass and
+            #     # substitute with your code.
+            #     pass
