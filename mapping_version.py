@@ -1,6 +1,6 @@
 from qgis.PyQt.QtWidgets import QMessageBox,QTextEdit
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt,QSettings
 
 # QT6
 try :
@@ -30,6 +30,8 @@ try :
     WaitCursor = Qt.CursorShape.WaitCursor
     AscendingOrder = QtCore.Qt.SortOrder.AscendingOrder
     NoWrap = QTextEdit.LineWrapMode.NoWrap
+    NativeFormat = QSettings.Format.NativeFormat
+    UserScope = QSettings.Scope.UserScope
 # QT5
 except :
     Dialog = Qt.Dialog
@@ -58,3 +60,5 @@ except :
     WaitCursor = Qt.WaitCursor
     AscendingOrder = QtCore.Qt.AscendingOrder
     NoWrap = QTextEdit.NoWrap
+    NativeFormat = QSettings.NativeFormat
+    UserScope = QSettings.UserScope

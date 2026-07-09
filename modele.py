@@ -64,4 +64,4 @@ def config_modele(champs_manquant,champs_readonly):
 
     dlgConfig.tableWidget_etat_champs.resizeColumnsToContents()
 
-    dlgConfig.exec_()
+    dlgConfig.exec()
